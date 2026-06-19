@@ -1,0 +1,275 @@
+@import "tailwindcss";
+
+@theme {
+  /* Curatorial noir — warm cream, near-black ink, signal red */
+  --color-paper: #f1ebe0;
+  --color-paper-dim: #e7dfd0;
+  --color-ink: #141009;
+  --color-ink-soft: #5f574a;
+  --color-muted: #908676;
+  --color-signal: #df3b1f;
+  --color-signal-deep: #b62f17;
+  --color-gold: #b89255;
+  --color-line: rgba(20, 16, 9, 0.16);
+
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --ease-art: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  overflow-x: clip;
+}
+
+html {
+  scrollbar-gutter: stable;
+  scrollbar-color: var(--color-ink) var(--color-paper-dim);
+}
+
+::selection {
+  background: var(--color-signal);
+  color: #fff;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* chapter overlay — phased scrollbar handoff */
+html.chapter-open,
+html.chapter-open body {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+.chapter-panel {
+  overscroll-behavior: contain;
+}
+
+/* ---- scrollbar base ---- */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-paper-dim);
+  transition: background 0.4s var(--ease-art);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink);
+  transition: background 0.4s var(--ease-art);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-signal);
+}
+
+/* main scrollbar fades out while chapter opens */
+html.chapter-opening {
+  scrollbar-color: transparent var(--color-paper-dim);
+}
+html.chapter-opening::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* main scrollbar stays hidden while chapter is open */
+html.chapter-open {
+  scrollbar-color: transparent var(--color-paper-dim);
+}
+html.chapter-open::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* main scrollbar fades back in on close */
+html.chapter-closing {
+  scrollbar-color: var(--color-ink) var(--color-paper-dim);
+}
+html.chapter-closing::-webkit-scrollbar-thumb {
+  background: var(--color-ink);
+  transition: background 0.4s var(--ease-art) 0.12s;
+}
+
+/* chapter scrollbar — track always present, thumb fades in after open */
+.chapter-scroll {
+  scrollbar-color: transparent var(--color-paper-dim);
+}
+.chapter-scroll::-webkit-scrollbar-thumb {
+  background: transparent;
+  transition: background 0.45s var(--ease-art) 0.08s;
+}
+.chapter-scroll.chapter-scroll--ready {
+  scrollbar-color: var(--color-ink) var(--color-paper-dim);
+}
+.chapter-scroll.chapter-scroll--ready::-webkit-scrollbar-thumb {
+  background: var(--color-ink);
+}
+
+/* chapter scrollbar fades out before main returns */
+html.chapter-closing .chapter-scroll::-webkit-scrollbar-thumb {
+  background: transparent !important;
+  transition: background 0.35s var(--ease-art);
+}
+html.chapter-closing .chapter-scroll {
+  scrollbar-color: transparent var(--color-paper-dim);
+}
+
+/* ---- type helpers ---- */
+.display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+}
+
+.serif-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.66rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+
+.outline {
+  -webkit-text-stroke: 1.4px currentColor;
+  color: transparent;
+}
+
+/* ---- grain + texture ---- */
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+}
+
+/* hairline rule */
+.rule {
+  height: 1px;
+  width: 100%;
+  background: var(--color-line);
+}
+
+/* link underline sweep */
+.sweep {
+  background-image: linear-gradient(var(--color-signal), var(--color-signal));
+  background-size: 0% 1.5px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.45s var(--ease-art);
+}
+.sweep:hover {
+  background-size: 100% 1.5px;
+}
+
+/* curtain reveal mask for words */
+.reveal-mask {
+  display: block;
+  overflow: hidden;
+}
+
+/* paint layer — above page content, except #founder-portrait */
+.paint-trail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#founder {
+  position: relative;
+  z-index: 0;
+}
+
+#founder-portrait {
+  z-index: 20;
+}
+
+/* custom cursor — a single drop of pigment */
+.cur {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 96;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--color-signal);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 8px rgba(223, 59, 31, 0.35);
+  transition: width 0.28s var(--ease-art), height 0.28s var(--ease-art),
+    background 0.3s, opacity 0.3s, box-shadow 0.3s;
+}
+
+/* hover on links/buttons — bloom into a soft brush ring */
+.cur[data-active="1"] {
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: 1.5px solid var(--color-signal);
+  box-shadow: 0 0 0 3px rgba(223, 59, 31, 0.1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  a,
+  button,
+  [data-cursor] {
+    cursor: none;
+  }
+}
+
+@media (hover: none) {
+  .cur,
+  .paint-trail {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
