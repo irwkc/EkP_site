@@ -18,6 +18,7 @@ export function getLenis() {
 export function useLenis(enabled = true) {
   useEffect(() => {
     if (!enabled) return;
+    if (window.matchMedia("(hover: none)").matches) return;
     if (isSafari()) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 

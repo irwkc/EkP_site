@@ -9,11 +9,13 @@ export default function Preloader() {
     const lenis = getLenis();
     lenis?.stop();
     document.body.style.overflow = "hidden";
+    const isTouch = window.matchMedia("(hover: none)").matches;
+    const delay = isTouch ? 1100 : 1900;
     const t = setTimeout(() => {
       setDone(true);
       lenis?.start();
       document.body.style.overflow = "";
-    }, 1900);
+    }, delay);
     return () => clearTimeout(t);
   }, []);
 

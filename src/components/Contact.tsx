@@ -11,7 +11,7 @@ const ROWS = [
 
 export default function Contact() {
   return (
-    <section id="contact" className="relative bg-ink px-5 pb-10 pt-24 text-paper md:px-10 md:pt-32">
+    <section id="contact" className="relative bg-ink px-4 pb-8 pt-16 text-paper safe-bottom md:px-10 md:pb-10 md:pt-32">
       <div className="mx-auto max-w-[1600px]">
         <p className="label mb-8 text-signal">Свяжитесь с нами</p>
 
@@ -24,15 +24,15 @@ export default function Contact() {
           transition={{ duration: 0.8, ease: EASE }}
           className="group block"
         >
-          <h2 className="display text-[clamp(2.6rem,11vw,11rem)] leading-[0.9] transition-colors duration-300 group-hover:text-signal">
+          <h2 className="display text-[clamp(2.75rem,11vw,11rem)] leading-[0.9] transition-colors duration-300 group-hover:text-signal">
             Возьмите
             <br />
             <span className="serif-italic">кисть</span> →
           </h2>
         </motion.a>
 
-        <div className="mt-16 grid gap-10 border-t border-paper/15 pt-12 md:grid-cols-[1.2fr_1fr]">
-          <div className="grid gap-px bg-paper/15 sm:grid-cols-3">
+        <div className="mt-12 grid gap-8 border-t border-paper/15 pt-10 md:mt-16 md:gap-10 md:pt-12 md:grid-cols-[1.2fr_1fr]">
+          <div className="grid grid-cols-1 gap-px bg-paper/15 sm:grid-cols-3">
             {ROWS.map((r) => (
               <a
                 key={r.label}
@@ -40,10 +40,10 @@ export default function Contact() {
                 target={r.href.startsWith("http") ? "_blank" : undefined}
                 rel="noreferrer"
                 data-cursor
-                className="group bg-ink p-5 transition-colors hover:bg-paper/[0.04]"
+                className="group bg-ink p-5 transition-colors active:bg-paper/[0.06] md:hover:bg-paper/[0.04]"
               >
                 <p className="label text-muted">{r.label}</p>
-                <p className="sweep mt-3 inline-block text-lg group-hover:text-signal">
+                <p className="mt-3 text-base group-active:text-signal sm:text-lg md:sweep md:group-hover:text-signal">
                   {r.value}
                 </p>
               </a>
@@ -66,9 +66,11 @@ export default function Contact() {
           </div>
         </div>
 
-        <div className="mt-20 border-t border-paper/15 pt-6">
-          <div className="flex flex-col gap-3 text-paper/50 md:flex-row md:items-center md:justify-between">
-            <p className="label">© {new Date().getFullYear()} Сергиевская · Художественная мастерская</p>
+        <div className="mt-14 border-t border-paper/15 pt-6 md:mt-20">
+          <div className="flex flex-col gap-4 text-paper/50 md:flex-row md:items-center md:justify-between md:gap-3">
+            <p className="label text-[0.58rem] leading-relaxed md:text-[0.66rem]">
+              © {new Date().getFullYear()} Сергиевская · Художественная мастерская
+            </p>
             <p className="label">
               made by{" "}
               <a

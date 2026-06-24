@@ -6,7 +6,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 function Line({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
-    <span className="reveal-mask">
+    <span className="reveal-mask block">
       <motion.span
         className="inline-block"
         initial={{ y: "115%" }}
@@ -25,92 +25,90 @@ export default function Hero() {
     target: ref,
     offset: ["start start", "end start"],
   });
-  const txtY = useTransform(scrollYProgress, [0, 1], ["0%", "-12%"]);
+  const txtY = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
   const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
 
   return (
     <section
       ref={ref}
-      className="relative flex min-h-[100svh] w-full flex-col justify-between overflow-hidden pb-8 pt-28 md:pb-10 md:pt-32"
+      className="relative flex min-h-[100svh] w-full flex-col overflow-hidden"
     >
-      {/* top meta row */}
-      <motion.div
-        style={{ opacity: fade }}
-        className="mx-auto flex w-full max-w-[1600px] items-start justify-between px-5 md:px-10"
-      >
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          className="label max-w-[16ch] text-ink-soft"
-        >
-          Авторская мастерская Екатерины Сергиевской
-        </motion.p>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7, duration: 0.8 }}
-          className="label text-right text-ink-soft"
-        >
-          Рязань · {STUDIO.address}
-          <br />
-          <span className="text-signal">№ 2012—26</span>
-        </motion.p>
-      </motion.div>
+      <div className="mx-auto flex min-h-[100svh] w-full max-w-[1600px] flex-col justify-between px-4 pb-8 pt-[calc(5.25rem+env(safe-area-inset-top))] md:px-10 md:pb-10 md:pt-32">
+        {/* top meta — compact on mobile */}
+        <motion.div style={{ opacity: fade }} className="shrink-0">
+          <p className="label text-ink-soft md:hidden">
+            Авторская мастерская · Рязань
+          </p>
+          <div className="hidden w-full items-start justify-between md:flex">
+            <p className="label max-w-[16ch] text-ink-soft">
+              Авторская мастерская Екатерины Сергиевской
+            </p>
+            <p className="label text-right text-ink-soft">
+              Рязань · {STUDIO.address}
+              <br />
+              <span className="text-signal">№ 2012—26</span>
+            </p>
+          </div>
+        </motion.div>
 
-      {/* headline block */}
-      <motion.div
-        style={{ y: txtY }}
-        className="relative mx-auto w-full max-w-[1600px] px-5 md:px-10"
-      >
-        <h1 className="display relative z-10 text-ink">
-          <span className="block text-[clamp(2.9rem,13vw,12.5rem)]">
-            <Line delay={0.25}>Холст,</Line>
-          </span>
-          <span className="block pl-[6vw] text-[clamp(2.9rem,13vw,12.5rem)]">
-            <Line delay={0.36}>
-              <span className="serif-italic text-signal">краски</span>
-            </Line>
-          </span>
-          <span className="block text-[clamp(2.9rem,13vw,12.5rem)]">
-            <Line delay={0.47}>
-              <span className="outline">и&nbsp;ты</span>
-            </Line>
-          </span>
-        </h1>
-      </motion.div>
-
-      {/* bottom row */}
-      <motion.div
-        style={{ opacity: fade }}
-        className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-5 md:flex-row md:items-end md:justify-between md:px-10"
-      >
-        <motion.p
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.9 }}
-          className="max-w-sm text-base leading-relaxed text-ink-soft md:text-lg"
+        {/* headline — focal point on mobile */}
+        <motion.div
+          style={{ y: txtY }}
+          className="flex flex-1 flex-col justify-center py-6 md:py-10"
         >
-          Живопись с нуля, реставрация мебели и авторские картины —
-          в пространстве, где красоте учат каждого.
-        </motion.p>
-
-        <motion.a
-          href="#index"
-          data-cursor
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1, duration: 0.9 }}
-          className="group flex items-center gap-4"
-        >
-          <span className="flex h-14 w-14 items-center justify-center rounded-full border border-ink transition-colors duration-300 group-hover:border-signal group-hover:bg-signal">
-            <span className="text-xl transition-colors duration-300 group-hover:text-paper">
-              ↓
+          <motion.h1
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="display relative z-10 text-ink"
+          >
+            <span className="block text-[clamp(3.75rem,19vw,12.5rem)] leading-[0.88]">
+              <Line delay={0.2}>Холст,</Line>
             </span>
-          </span>
-          <span className="label">Шесть направлений</span>
-        </motion.a>
-      </motion.div>
+            <span className="block pl-[10vw] text-[clamp(3.75rem,19vw,12.5rem)] leading-[0.88] sm:pl-[6vw]">
+              <Line delay={0.3}>
+                <span className="serif-italic text-signal">краски</span>
+              </Line>
+            </span>
+            <span className="block text-[clamp(3.75rem,19vw,12.5rem)] leading-[0.88]">
+              <Line delay={0.4}>
+                <span className="outline">и&nbsp;ты</span>
+              </Line>
+            </span>
+          </motion.h1>
+        </motion.div>
+
+        {/* bottom */}
+        <motion.div
+          style={{ opacity: fade }}
+          className="flex shrink-0 flex-col gap-6 md:flex-row md:items-end md:justify-between"
+        >
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.85, duration: 0.9 }}
+            className="max-w-md text-base leading-relaxed text-ink-soft md:text-lg"
+          >
+            Живопись с нуля, реставрация мебели и авторские картины — в
+            пространстве, где красоте учат каждого.
+          </motion.p>
+
+          <motion.a
+            href="#index"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.95, duration: 0.9 }}
+            className="group flex w-full items-center justify-between gap-4 border-t border-line pt-5 md:w-auto md:justify-start md:border-t-0 md:pt-0"
+          >
+            <span className="label">Шесть направлений</span>
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-ink transition-colors duration-300 active:border-signal active:bg-signal md:group-hover:border-signal md:group-hover:bg-signal">
+              <span className="text-lg transition-colors duration-300 active:text-paper md:group-hover:text-paper">
+                ↓
+              </span>
+            </span>
+          </motion.a>
+        </motion.div>
+      </div>
     </section>
   );
 }

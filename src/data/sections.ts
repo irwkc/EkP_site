@@ -83,6 +83,24 @@ export const SECTIONS: Section[] = [
   },
 ];
 
+export const SECTION_KEYS = SECTIONS.map((s) => s.key);
+
+export function isSectionKey(value: string): value is SectionKey {
+  return SECTION_KEYS.includes(value as SectionKey);
+}
+
+export function getSectionPath(key: SectionKey) {
+  return `/${key}`;
+}
+
+export function getAdjacentSections(key: SectionKey) {
+  const i = SECTIONS.findIndex((s) => s.key === key);
+  return {
+    prev: i > 0 ? SECTIONS[i - 1] : null,
+    next: i < SECTIONS.length - 1 ? SECTIONS[i + 1] : null,
+  };
+}
+
 export const STUDIO = {
   name: "Художественная мастерская",
   owner: "Екатерина Сергиевская",

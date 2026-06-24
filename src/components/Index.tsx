@@ -1,53 +1,47 @@
-import { SECTIONS, type SectionKey } from "../data/sections";
+import { Link } from "react-router-dom";
+import { SECTIONS, getSectionPath } from "../data/sections";
 
-export default function Index({
-  onOpen,
-}: {
-  onOpen: (key: SectionKey) => void;
-}) {
+export default function Index() {
   return (
-    <section id="index" className="relative bg-paper px-5 py-24 md:px-10 md:py-36">
+    <section id="index" className="relative bg-paper px-4 py-14 md:px-10 md:py-36">
       <div className="mx-auto max-w-[1600px]">
-        <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        <div className="mb-8 flex flex-col gap-4 md:mb-14 md:flex-row md:items-end md:justify-between md:gap-6">
           <div>
-            <p className="label mb-5 text-signal">Указатель · 6 разделов</p>
-            <h2 className="display text-[clamp(2.4rem,8vw,7rem)]">
+            <p className="label mb-4 text-signal md:mb-5">Указатель · 6 разделов</p>
+            <h2 className="display text-[clamp(2.75rem,11vw,7rem)] leading-[0.92]">
               Шесть
               <br />
               <span className="serif-italic">направлений</span>
             </h2>
           </div>
-          <p className="max-w-xs text-ink-soft md:text-right">
-            От первого мазка до фамильного комода. Нажмите, чтобы открыть
-            собрание работ.
+          <p className="max-w-sm text-sm leading-relaxed text-ink-soft md:max-w-xs md:text-right md:text-base">
+            От первого мазка до фамильного комода. Выберите направление —
+            откроется отдельная страница с работами.
           </p>
         </div>
 
         <ul className="border-t border-line">
           {SECTIONS.map((s) => (
             <li key={s.key}>
-              <button
-                data-cursor
-                onClick={() => onOpen(s.key)}
-                className="group flex w-full items-center justify-between gap-4 border-b border-line py-6 text-left transition-colors md:py-9"
+              <Link
+                to={getSectionPath(s.key)}
+                className="group flex w-full items-start justify-between gap-4 border-b border-line py-5 transition-colors active:bg-paper-dim md:items-center md:py-9"
               >
-                <div className="flex items-baseline gap-5 md:gap-10">
-                  <span className="label w-8 text-muted transition-colors group-hover:text-signal">
-                    {s.index}
-                  </span>
-                  <span className="display text-[clamp(1.8rem,5.5vw,4.5rem)] transition-all duration-500 ease-art group-hover:translate-x-3 group-hover:text-signal">
-                    {s.title}
-                  </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-baseline gap-3 md:gap-10">
+                    <span className="label w-7 shrink-0 text-muted md:w-8">
+                      {s.index}
+                    </span>
+                    <span className="display text-[clamp(1.65rem,7.5vw,4.5rem)] leading-[0.95] transition-colors group-active:text-signal md:transition-all md:duration-500 md:ease-art md:group-hover:translate-x-3 md:group-hover:text-signal">
+                      {s.title}
+                    </span>
+                  </div>
+                  <p className="label mt-2 pl-10 text-muted md:hidden">{s.kicker}</p>
                 </div>
-                <div className="flex items-center gap-5">
-                  <span className="hidden max-w-[12rem] text-right text-xs text-muted lg:block">
-                    {s.kicker}
-                  </span>
-                  <span className="text-2xl transition-all duration-500 ease-art group-hover:translate-x-2 group-hover:text-signal md:text-3xl">
-                    ↗
-                  </span>
-                </div>
-              </button>
+                <span className="mt-2 shrink-0 text-xl text-signal md:mt-0 md:text-3xl">
+                  ↗
+                </span>
+              </Link>
             </li>
           ))}
         </ul>

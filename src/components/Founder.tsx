@@ -81,7 +81,7 @@ export default function Founder() {
       <section
         id="founder"
         ref={sectionRef}
-        className="relative z-0 border-y border-line bg-paper-dim px-5 py-24 md:px-10 md:py-36"
+        className="relative z-0 border-y border-line bg-paper-dim px-4 py-16 md:px-10 md:py-36"
       >
         <div className="mx-auto grid max-w-[1600px] items-center gap-12 md:grid-cols-[0.85fr_1.15fr] md:gap-20">
           {/* layout slot — portrait is portaled above the paint layer */}
@@ -100,7 +100,7 @@ export default function Founder() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: EASE }}
-              className="display text-[clamp(1.8rem,3.6vw,3.4rem)] leading-tight"
+              className="display text-[clamp(1.6rem,5vw,3.4rem)] leading-tight md:text-[clamp(1.8rem,3.6vw,3.4rem)]"
             >
               «{FOUNDER.lead}»
             </motion.h2>
@@ -114,10 +114,10 @@ export default function Founder() {
               ))}
             </div>
 
-            <div className="mt-10 flex gap-10 border-t border-line pt-8">
+            <div className="mt-8 flex flex-wrap gap-x-10 gap-y-6 border-t border-line pt-8">
               {FOUNDER.stats.map((s) => (
-                <div key={s.label}>
-                  <p className="display text-4xl md:text-5xl">{s.value}</p>
+                <div key={s.label} className="min-w-[5.5rem]">
+                  <p className="display text-3xl md:text-5xl">{s.value}</p>
                   <p className="label mt-2 text-muted">{s.label}</p>
                 </div>
               ))}

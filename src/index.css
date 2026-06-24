@@ -59,15 +59,27 @@ html.lenis body {
   overflow: hidden;
 }
 
-/* chapter overlay — phased scrollbar handoff */
-html.chapter-open,
-html.chapter-open body {
-  overflow: hidden !important;
-  overscroll-behavior: none;
+/* section page — paint pour + masonry gallery */
+.chapter-paint-pour {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
-.chapter-panel {
-  overscroll-behavior: contain;
+.chapter-gallery-item {
+  break-inside: avoid;
+}
+
+/* safe areas for notched phones */
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* ---- scrollbar base ---- */
@@ -84,55 +96,6 @@ html.chapter-open body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-signal);
-}
-
-/* main scrollbar fades out while chapter opens */
-html.chapter-opening {
-  scrollbar-color: transparent var(--color-paper-dim);
-}
-html.chapter-opening::-webkit-scrollbar-thumb {
-  background: transparent;
-}
-
-/* main scrollbar stays hidden while chapter is open */
-html.chapter-open {
-  scrollbar-color: transparent var(--color-paper-dim);
-}
-html.chapter-open::-webkit-scrollbar-thumb {
-  background: transparent;
-}
-
-/* main scrollbar fades back in on close */
-html.chapter-closing {
-  scrollbar-color: var(--color-ink) var(--color-paper-dim);
-}
-html.chapter-closing::-webkit-scrollbar-thumb {
-  background: var(--color-ink);
-  transition: background 0.4s var(--ease-art) 0.12s;
-}
-
-/* chapter scrollbar — track always present, thumb fades in after open */
-.chapter-scroll {
-  scrollbar-color: transparent var(--color-paper-dim);
-}
-.chapter-scroll::-webkit-scrollbar-thumb {
-  background: transparent;
-  transition: background 0.45s var(--ease-art) 0.08s;
-}
-.chapter-scroll.chapter-scroll--ready {
-  scrollbar-color: var(--color-ink) var(--color-paper-dim);
-}
-.chapter-scroll.chapter-scroll--ready::-webkit-scrollbar-thumb {
-  background: var(--color-ink);
-}
-
-/* chapter scrollbar fades out before main returns */
-html.chapter-closing .chapter-scroll::-webkit-scrollbar-thumb {
-  background: transparent !important;
-  transition: background 0.35s var(--ease-art);
-}
-html.chapter-closing .chapter-scroll {
-  scrollbar-color: transparent var(--color-paper-dim);
 }
 
 /* ---- type helpers ---- */
@@ -264,6 +227,15 @@ html.chapter-closing .chapter-scroll {
   .cur,
   .paint-trail {
     display: none;
+  }
+
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .outline {
+    -webkit-text-stroke: 1px currentColor;
   }
 }
 
