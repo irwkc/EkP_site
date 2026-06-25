@@ -22,13 +22,13 @@ export default function CatalogTeaser() {
 
   return (
     <section
-      id="catalog"
+      id="pricelist"
       className="relative border-y border-line bg-paper-dim px-4 py-14 md:px-10 md:py-24"
     >
       <div className="mx-auto max-w-[1600px]">
         <div className="mb-10 flex flex-col gap-4 md:mb-14 md:flex-row md:items-end md:justify-between md:gap-6">
           <div>
-            <p className="label mb-4 text-signal md:mb-5">Каталог · Прайс</p>
+            <p className="label mb-4 text-signal md:mb-5">Прайс лист</p>
             <h2 className="display text-[clamp(2.5rem,10vw,6rem)] leading-[0.92]">
               Картины
               <br />

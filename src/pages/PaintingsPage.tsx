@@ -43,15 +43,15 @@ export default function PaintingsPage() {
           <div className="relative z-[1] mx-auto max-w-[1600px] px-4 pb-12 pt-[calc(5.5rem+env(safe-area-inset-top))] md:px-10 md:pb-16 md:pt-32">
             <Link
               to="/"
-              state={{ scrollTo: "catalog" }}
-              onClick={() => setScrollIntent("catalog")}
+              state={{ scrollTo: "pricelist" }}
+              onClick={() => setScrollIntent("pricelist")}
               className="label inline-flex items-center gap-2 text-muted transition-colors active:text-signal"
             >
               ← На главную
             </Link>
 
             <div className="mt-8 md:mt-10">
-              <span className="label text-signal">Каталог · 01</span>
+              <span className="label text-signal">Прайс лист · 01</span>
               <h1 className="display mt-3 text-[clamp(2.25rem,9vw,5rem)] leading-[0.92]">
                 Картины
                 <br />

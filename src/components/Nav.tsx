@@ -10,7 +10,7 @@ const LINKS = [
   { href: "/#index", label: "Направления", n: "01" },
   { href: "/#founder", label: "Основатель", n: "02" },
   { href: "/#exhibition", label: "Работы", n: "03" },
-  { href: "/#catalog", label: "Каталог", n: "04" },
+  { href: "/#pricelist", label: "Прайс лист", n: "04" },
   { href: "/#contact", label: "Контакты", n: "05" },
 ];
 
