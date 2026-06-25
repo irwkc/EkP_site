@@ -1,0 +1,404 @@
+{
+  "gallery": {
+    "zhivopis": [
+      "/vk/zhivopis/01.jpg",
+      "/vk/zhivopis/02.jpg",
+      "/vk/zhivopis/03.jpg",
+      "/vk/zhivopis/04.jpg",
+      "/vk/zhivopis/05.jpg",
+      "/vk/zhivopis/06.jpg",
+      "/vk/zhivopis/07.jpg",
+      "/vk/zhivopis/08.jpg",
+      "/vk/zhivopis/09.jpg",
+      "/vk/zhivopis/10.jpg",
+      "/vk/zhivopis/11.jpg",
+      "/vk/zhivopis/12.jpg",
+      "/vk/zhivopis/13.jpg",
+      "/vk/zhivopis/14.jpg",
+      "/vk/zhivopis/15.jpg",
+      "/vk/zhivopis/16.jpg",
+      "/vk/zhivopis/17.jpg",
+      "/vk/zhivopis/18.jpg",
+      "/vk/zhivopis/19.jpg",
+      "/vk/zhivopis/20.jpg",
+      "/vk/zhivopis/21.jpg",
+      "/vk/zhivopis/22.jpg",
+      "/vk/zhivopis/23.jpg",
+      "/vk/zhivopis/24.jpg",
+      "/vk/zhivopis/25.jpg",
+      "/vk/zhivopis/26.jpg",
+      "/vk/zhivopis/27.jpg",
+      "/vk/zhivopis/28.jpg"
+    ],
+    "kurs": [
+      "/vk/kurs/01.jpg",
+      "/vk/kurs/02.jpg",
+      "/vk/kurs/03.jpg",
+      "/vk/kurs/04.jpg",
+      "/vk/kurs/05.jpg",
+      "/vk/kurs/06.jpg",
+      "/vk/kurs/07.jpg",
+      "/vk/kurs/08.jpg",
+      "/vk/kurs/09.jpg",
+      "/vk/kurs/10.jpg",
+      "/vk/kurs/11.jpg",
+      "/vk/kurs/12.jpg",
+      "/vk/kurs/13.jpg",
+      "/vk/kurs/14.jpg",
+      "/vk/kurs/15.jpg",
+      "/vk/kurs/16.jpg",
+      "/vk/kurs/17.jpg",
+      "/vk/kurs/18.jpg",
+      "/vk/kurs/19.jpg",
+      "/vk/kurs/20.jpg",
+      "/vk/kurs/21.jpg",
+      "/vk/kurs/22.jpg",
+      "/vk/kurs/23.jpg",
+      "/vk/kurs/24.jpg",
+      "/vk/kurs/26.jpg"
+    ],
+    "masterskaya": [
+      "/vk/masterskaya/01.jpg",
+      "/vk/masterskaya/02.jpg",
+      "/vk/masterskaya/03.jpg",
+      "/vk/masterskaya/04.jpg",
+      "/vk/masterskaya/05.jpg",
+      "/vk/masterskaya/06.jpg",
+      "/vk/masterskaya/07.jpg",
+      "/vk/masterskaya/08.jpg",
+      "/vk/masterskaya/09.jpg",
+      "/vk/masterskaya/10.jpg",
+      "/vk/masterskaya/11.jpg",
+      "/vk/masterskaya/12.jpg",
+      "/vk/masterskaya/13.jpg",
+      "/vk/masterskaya/14.jpg",
+      "/vk/masterskaya/15.jpg",
+      "/vk/masterskaya/16.jpg",
+      "/vk/masterskaya/17.jpg",
+      "/vk/masterskaya/18.jpg",
+      "/vk/masterskaya/20.jpg",
+      "/vk/masterskaya/21.jpg",
+      "/vk/masterskaya/22.jpg",
+      "/vk/masterskaya/23.jpg",
+      "/vk/masterskaya/24.jpg",
+      "/vk/masterskaya/25.jpg",
+      "/vk/masterskaya/26.jpg",
+      "/vk/masterskaya/27.jpg",
+      "/vk/masterskaya/28.jpg",
+      "/vk/masterskaya/29.jpg",
+      "/vk/masterskaya/30.jpg",
+      "/vk/masterskaya/31.jpg",
+      "/vk/masterskaya/32.jpg",
+      "/vk/masterskaya/33.jpg"
+    ],
+    "mebel": [
+      "/vk/mebel/01.jpg",
+      "/vk/mebel/02.jpg",
+      "/vk/mebel/03.jpg",
+      "/vk/mebel/04.jpg",
+      "/vk/mebel/05.jpg",
+      "/vk/mebel/06.jpg",
+      "/vk/mebel/07.jpg",
+      "/vk/mebel/09.jpg",
+      "/vk/mebel/10.jpg",
+      "/vk/mebel/11.jpg",
+      "/vk/mebel/12.jpg",
+      "/vk/mebel/13.jpg",
+      "/vk/mebel/14.jpg",
+      "/vk/mebel/15.jpg",
+      "/vk/mebel/16.jpg",
+      "/vk/mebel/17.jpg",
+      "/vk/mebel/18.jpg",
+      "/vk/mebel/19.jpg",
+      "/vk/mebel/20.jpg",
+      "/vk/mebel/21.jpg",
+      "/vk/mebel/22.jpg",
+      "/vk/mebel/23.jpg",
+      "/vk/mebel/24.jpg",
+      "/vk/mebel/25.jpg",
+      "/vk/mebel/26.jpg",
+      "/vk/mebel/27.jpg",
+      "/vk/mebel/28.jpg",
+      "/vk/mebel/29.jpg",
+      "/vk/mebel/31.jpg",
+      "/vk/mebel/32.jpg",
+      "/vk/mebel/33.jpg",
+      "/vk/mebel/34.jpg",
+      "/vk/mebel/35.jpg",
+      "/vk/mebel/36.jpg"
+    ],
+    "kartiny": [
+      "/vk/kartiny/01.jpg",
+      "/vk/kartiny/02.jpg",
+      "/vk/kartiny/03.jpg",
+      "/vk/kartiny/04.jpg",
+      "/vk/kartiny/05.jpg",
+      "/vk/kartiny/06.jpg",
+      "/vk/kartiny/07.jpg",
+      "/vk/kartiny/08.jpg",
+      "/vk/kartiny/09.jpg",
+      "/vk/kartiny/10.jpg",
+      "/vk/kartiny/11.jpg",
+      "/vk/kartiny/12.jpg",
+      "/vk/kartiny/13.jpg",
+      "/vk/kartiny/14.jpg",
+      "/vk/kartiny/15.jpg",
+      "/vk/kartiny/16.jpg",
+      "/vk/kartiny/17.jpg",
+      "/vk/kartiny/18.jpg",
+      "/vk/kartiny/19.jpg",
+      "/vk/kartiny/20.jpg",
+      "/vk/kartiny/21.jpg",
+      "/vk/kartiny/22.jpg",
+      "/vk/kartiny/23.jpg",
+      "/vk/kartiny/24.jpg",
+      "/vk/kartiny/25.jpg",
+      "/vk/kartiny/26.jpg",
+      "/vk/kartiny/27.jpg",
+      "/vk/kartiny/28.jpg",
+      "/vk/kartiny/29.jpg",
+      "/vk/kartiny/30.jpg",
+      "/vk/kartiny/31.jpg",
+      "/vk/kartiny/32.jpg",
+      "/vk/kartiny/33.jpg",
+      "/vk/kartiny/34.jpg",
+      "/vk/kartiny/35.jpg",
+      "/vk/kartiny/36.jpg"
+    ],
+    "masterclass": [
+      "/vk/masterclass/01.jpg",
+      "/vk/masterclass/02.jpg",
+      "/vk/masterclass/03.jpg",
+      "/vk/masterclass/04.jpg",
+      "/vk/masterclass/05.jpg",
+      "/vk/masterclass/06.jpg",
+      "/vk/masterclass/07.jpg",
+      "/vk/masterclass/08.jpg",
+      "/vk/masterclass/09.jpg",
+      "/vk/masterclass/10.jpg",
+      "/vk/masterclass/11.jpg",
+      "/vk/masterclass/12.jpg",
+      "/vk/masterclass/13.jpg",
+      "/vk/masterclass/14.jpg",
+      "/vk/masterclass/15.jpg",
+      "/vk/masterclass/16.jpg",
+      "/vk/masterclass/17.jpg",
+      "/vk/masterclass/18.jpg",
+      "/vk/masterclass/19.jpg",
+      "/vk/masterclass/20.jpg",
+      "/vk/masterclass/21.jpg",
+      "/vk/masterclass/22.jpg",
+      "/vk/masterclass/23.jpg",
+      "/vk/masterclass/24.jpg",
+      "/vk/masterclass/25.jpg",
+      "/vk/masterclass/26.jpg",
+      "/vk/masterclass/27.jpg",
+      "/vk/masterclass/28.jpg",
+      "/vk/masterclass/29.jpg",
+      "/vk/masterclass/30.jpg",
+      "/vk/masterclass/31.jpg",
+      "/vk/masterclass/32.jpg",
+      "/vk/masterclass/33.jpg",
+      "/vk/masterclass/34.jpg",
+      "/vk/masterclass/35.jpg",
+      "/vk/masterclass/36.jpg"
+    ]
+  },
+  "priceGroups": [
+    {
+      "id": "zhivopis",
+      "title": "Живопись с нуля",
+      "kicker": "Студия",
+      "items": [
+        {
+          "name": "Разовое занятие",
+          "detail": "2,5 ч · все материалы",
+          "price": "2 500 ₽"
+        },
+        {
+          "name": "Абонемент 4 занятия",
+          "detail": "действует 2 месяца",
+          "price": "9 000 ₽"
+        },
+        {
+          "name": "Индивидуально",
+          "detail": "1,5–2 ч с мастером",
+          "price": "от 3 500 ₽"
+        }
+      ]
+    },
+    {
+      "id": "masterclass",
+      "title": "Мастер-классы",
+      "kicker": "Праздники и компании",
+      "items": [
+        {
+          "name": "Группа от 4 человек",
+          "detail": "на человека",
+          "price": "от 2 000 ₽"
+        },
+        {
+          "name": "День рождения / девичник",
+          "detail": "до 8 гостей",
+          "price": "от 18 000 ₽"
+        },
+        {
+          "name": "Корпоратив",
+          "detail": "выезд или в мастерской",
+          "price": "по запросу"
+        }
+      ]
+    },
+    {
+      "id": "kurs",
+      "title": "Курс-обучение",
+      "kicker": "Декор и реставрация",
+      "items": [
+        {
+          "name": "Полный курс",
+          "detail": "8 модулей · сертификат",
+          "price": "от 28 000 ₽"
+        },
+        {
+          "name": "Отдельный модуль",
+          "detail": "4 занятия",
+          "price": "от 8 500 ₽"
+        },
+        {
+          "name": "Пробное занятие",
+          "detail": "знакомство с программой",
+          "price": "2 000 ₽"
+        }
+      ]
+    },
+    {
+      "id": "extra",
+      "title": "Дополнительно",
+      "kicker": "Мастерская",
+      "items": [
+        {
+          "name": "Картина на заказ",
+          "detail": "любой размер",
+          "price": "по запросу"
+        },
+        {
+          "name": "Реставрация мебели",
+          "detail": "оценка по фото",
+          "price": "от 5 000 ₽"
+        },
+        {
+          "name": "Подарочный сертификат",
+          "detail": "любая сумма",
+          "price": "от 2 000 ₽"
+        }
+      ]
+    }
+  ],
+  "paintingsForSale": [
+    {
+      "id": "p1",
+      "title": "Утро на Соборной",
+      "medium": "масло, холст",
+      "size": "50 × 70 см",
+      "price": 28000,
+      "image": "/vk/kartiny/03.jpg",
+      "available": true
+    },
+    {
+      "id": "p2",
+      "title": "Натюрморт с лимонами",
+      "medium": "масло, холст",
+      "size": "40 × 50 см",
+      "price": 18500,
+      "image": "/vk/kartiny/09.jpg",
+      "available": true
+    },
+    {
+      "id": "p3",
+      "title": "Рязанский пейзаж",
+      "medium": "акрил, холст",
+      "size": "60 × 80 см",
+      "price": 32000,
+      "image": "/vk/kartiny/15.jpg",
+      "available": true
+    },
+    {
+      "id": "p4",
+      "title": "Тишина мастерской",
+      "medium": "масло, холст",
+      "size": "30 × 40 см",
+      "price": 12000,
+      "image": "/vk/kartiny/21.jpg",
+      "available": false
+    },
+    {
+      "id": "p5",
+      "title": "Летний сад",
+      "medium": "масло, холст",
+      "size": "50 × 60 см",
+      "price": 24000,
+      "image": "/vk/kartiny/06.jpg",
+      "available": true
+    },
+    {
+      "id": "p6",
+      "title": "Абстракция «Свет»",
+      "medium": "акрил, холст",
+      "size": "70 × 90 см",
+      "price": 45000,
+      "image": "/vk/kartiny/12.jpg",
+      "available": true
+    }
+  ],
+  "exhibitionPicks": [
+    {
+      "src": "/vk/kartiny/06.jpg",
+      "cap": "Авторская картина",
+      "span": "md:col-span-5 md:row-span-2"
+    },
+    {
+      "src": "/vk/zhivopis/04.jpg",
+      "cap": "Живопись с нуля",
+      "span": "md:col-span-3"
+    },
+    {
+      "src": "/vk/mebel/03.jpg",
+      "cap": "Реставрация комода",
+      "span": "md:col-span-4 md:row-span-2"
+    },
+    {
+      "src": "/vk/masterclass/08.jpg",
+      "cap": "Вечер с красками",
+      "span": "md:col-span-3"
+    },
+    {
+      "src": "/vk/kartiny/15.jpg",
+      "cap": "Натюрморт",
+      "span": "md:col-span-4"
+    },
+    {
+      "src": "/vk/masterskaya/07.jpg",
+      "cap": "В мастерской",
+      "span": "md:col-span-4"
+    },
+    {
+      "src": "/vk/kurs/05.jpg",
+      "cap": "Курс декора",
+      "span": "md:col-span-4"
+    }
+  ],
+  "photoStrip": [
+    "/vk/zhivopis/01.jpg",
+    "/vk/zhivopis/02.jpg",
+    "/vk/zhivopis/03.jpg",
+    "/vk/zhivopis/04.jpg",
+    "/vk/kartiny/01.jpg",
+    "/vk/kartiny/02.jpg",
+    "/vk/kartiny/03.jpg",
+    "/vk/kartiny/04.jpg",
+    "/vk/masterclass/01.jpg",
+    "/vk/masterclass/02.jpg",
+    "/vk/masterclass/03.jpg",
+    "/vk/masterclass/04.jpg"
+  ]
+}

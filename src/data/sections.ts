@@ -1,5 +1,3 @@
-import gallery from "./gallery.json";
-
 export type SectionKey =
   | "zhivopis"
   | "kurs"
@@ -18,9 +16,7 @@ export interface Section {
   images: string[];
 }
 
-const g = gallery as Record<SectionKey, string[]>;
-
-export const SECTIONS: Section[] = [
+export const SECTIONS_META: Omit<Section, "images">[] = [
   {
     key: "zhivopis",
     index: "01",
@@ -29,7 +25,6 @@ export const SECTIONS: Section[] = [
     blurb:
       "Берём кисть впервые — и за один вечер уходим с готовой картиной. Масло, акрил, пастель: ставим руку, чувство цвета и композицию без скучной теории.",
     meta: "Группы до 6 человек · Все материалы включены",
-    images: g.zhivopis,
   },
   {
     key: "kurs",
@@ -39,7 +34,6 @@ export const SECTIONS: Section[] = [
     blurb:
       "Полноценная программа для тех, кто хочет превратить любовь к красоте в ремесло. Учимся возвращать вещам вторую жизнь и создавать авторский декор.",
     meta: "8 модулей · Сертификат · Поддержка после курса",
-    images: g.kurs,
   },
   {
     key: "masterskaya",
@@ -49,7 +43,6 @@ export const SECTIONS: Section[] = [
     blurb:
       "Свет, мольберты, запах краски и тишина, в которой рождаются работы. Сюда приходят творить — поодиночке и компаниями.",
     meta: "ул. Радищева · Аренда мольберта · Свободное творчество",
-    images: g.masterskaya,
   },
   {
     key: "mebel",
@@ -59,7 +52,6 @@ export const SECTIONS: Section[] = [
     blurb:
       "Старый комод с историей превращается в акцент интерьера. Реставрируем, перекрашиваем и расписываем мебель под ваш дом.",
     meta: "Под заказ · Авторская роспись · Восстановление",
-    images: g.mebel,
   },
   {
     key: "kartiny",
@@ -69,7 +61,6 @@ export const SECTIONS: Section[] = [
     blurb:
       "Готовые интерьерные картины и работы на заказ — пейзажи, натюрморты, абстракции. Каждая написана вручную и существует в единственном экземпляре.",
     meta: "Оригиналы · Любой размер · Доставка",
-    images: g.kartiny,
   },
   {
     key: "masterclass",
@@ -79,11 +70,10 @@ export const SECTIONS: Section[] = [
     blurb:
       "Тёплый вечер с красками — для друзей, семьи или команды. Дни рождения, девичники, корпоративы: уходят с картиной и настроением.",
     meta: "От 2 человек · Выездные форматы · Подарочные сертификаты",
-    images: g.masterclass,
   },
 ];
 
-export const SECTION_KEYS = SECTIONS.map((s) => s.key);
+export const SECTION_KEYS = SECTIONS_META.map((s) => s.key);
 
 export function isSectionKey(value: string): value is SectionKey {
   return SECTION_KEYS.includes(value as SectionKey);
@@ -94,10 +84,10 @@ export function getSectionPath(key: SectionKey) {
 }
 
 export function getAdjacentSections(key: SectionKey) {
-  const i = SECTIONS.findIndex((s) => s.key === key);
+  const i = SECTIONS_META.findIndex((s) => s.key === key);
   return {
-    prev: i > 0 ? SECTIONS[i - 1] : null,
-    next: i < SECTIONS.length - 1 ? SECTIONS[i + 1] : null,
+    prev: i > 0 ? SECTIONS_META[i - 1] : null,
+    next: i < SECTIONS_META.length - 1 ? SECTIONS_META[i + 1] : null,
   };
 }
 

@@ -1,24 +1,20 @@
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import {
-  PAINTINGS_FOR_SALE,
-  PAINTINGS_PATH,
-  PRICE_GROUPS,
-  PRICES_PATH,
-  formatPrice,
-} from "../data/catalog";
+import { useSiteContent } from "../context/ContentContext";
+import { PAINTINGS_PATH, PRICES_PATH, formatPrice } from "../data/catalog";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-const PREVIEW_PAINTINGS = PAINTINGS_FOR_SALE.filter((p) => p.available).slice(0, 3);
-const PREVIEW_PRICES = PRICE_GROUPS.slice(0, 2).flatMap((g) =>
-  g.items.slice(0, 1).map((item) => ({ group: g.title, ...item }))
-);
-
 export default function CatalogTeaser() {
-  const minPrice = Math.min(
-    ...PAINTINGS_FOR_SALE.filter((p) => p.available).map((p) => p.price)
+  const { paintingsForSale, priceGroups } = useSiteContent();
+  const available = paintingsForSale.filter((p) => p.available);
+  const previewPaintings = available.slice(0, 3);
+  const previewPrices = priceGroups.slice(0, 2).flatMap((g) =>
+    g.items.slice(0, 1).map((item) => ({ group: g.title, ...item }))
   );
+  const minPrice = available.length
+    ? Math.min(...available.map((p) => p.price))
+    : 0;
 
   return (
     <section
@@ -53,11 +49,13 @@ export default function CatalogTeaser() {
                 <span className="label text-muted">01</span>
                 <h3 className="display mt-2 text-2xl md:text-3xl">В продаже</h3>
               </div>
-              <span className="label text-signal">от {formatPrice(minPrice)}</span>
+              {minPrice > 0 && (
+                <span className="label text-signal">от {formatPrice(minPrice)}</span>
+              )}
             </div>
 
             <div className="mt-6 grid grid-cols-3 gap-2 md:gap-3">
-              {PREVIEW_PAINTINGS.map((p) => (
+              {previewPaintings.map((p) => (
                 <div
                   key={p.id}
                   className="catalog-photo aspect-[4/5] overflow-hidden border border-line"
@@ -74,8 +72,7 @@ export default function CatalogTeaser() {
             </div>
 
             <p className="mt-5 text-sm text-muted md:mt-6">
-              {PAINTINGS_FOR_SALE.filter((p) => p.available).length} работ доступно
-              · оригиналы · доставка по РФ
+              {available.length} работ доступно · оригиналы · доставка по РФ
             </p>
 
             <Link
@@ -102,7 +99,7 @@ export default function CatalogTeaser() {
             </div>
 
             <ul className="mt-6 divide-y divide-line border-t border-line">
-              {PREVIEW_PRICES.map((item) => (
+              {previewPrices.map((item) => (
                 <li
                   key={item.group + item.name}
                   className="flex items-baseline justify-between gap-4 py-4"

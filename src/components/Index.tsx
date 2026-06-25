@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
-import { SECTIONS, getSectionPath } from "../data/sections";
+import { getSectionPath } from "../data/sections";
+import { useSections } from "../hooks/useSections";
 import { resetScrollPosition } from "../utils/scrollTo";
 
 export default function Index() {
+  const sections = useSections();
   return (
     <section id="index" className="relative bg-paper px-4 py-14 md:px-10 md:py-36">
       <div className="mx-auto max-w-[1600px]">
@@ -22,7 +24,7 @@ export default function Index() {
         </div>
 
         <ul className="border-t border-line">
-          {SECTIONS.map((s) => (
+          {sections.map((s) => (
             <li key={s.key}>
               <Link
                 to={getSectionPath(s.key)}

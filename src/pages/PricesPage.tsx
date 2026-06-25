@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { PAINTINGS_PATH, PRICE_GROUPS, PRICES_PATH } from "../data/catalog";
+import { PAINTINGS_PATH, PRICES_PATH } from "../data/catalog";
+import { useSiteContent } from "../context/ContentContext";
 import { STUDIO } from "../data/sections";
 import ChapterPaintPour from "../components/ChapterPaintPour";
 import { setScrollIntent } from "../utils/scrollIntent";
@@ -9,6 +10,8 @@ const DEFAULT_TITLE =
   "Сергиевская — Художественная мастерская в Рязани · живопись, реставрация, картины";
 
 export default function PricesPage() {
+  const { priceGroups } = useSiteContent();
+
   useEffect(() => {
     document.title = `Стоимость занятий — Сергиевская · Художественная мастерская`;
     return () => {
@@ -61,7 +64,7 @@ export default function PricesPage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            {PRICE_GROUPS.map((group) => (
+            {priceGroups.map((group) => (
               <div key={group.id} className="border border-line bg-paper p-5 md:p-7">
                 <span className="label text-signal">{group.kicker}</span>
                 <h2 className="display mt-2 text-2xl md:text-3xl">{group.title}</h2>

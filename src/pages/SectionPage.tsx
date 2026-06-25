@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import {
-  SECTIONS,
   STUDIO,
   getAdjacentSections,
   getSectionPath,
   isSectionKey,
 } from "../data/sections";
+import { useSections } from "../hooks/useSections";
 import ChapterPaintPour from "../components/ChapterPaintPour";
 import ChapterGallery from "../components/ChapterGallery";
 import { setScrollIntent } from "../utils/scrollIntent";
@@ -20,17 +20,18 @@ export default function SectionPage() {
   const { sectionKey } = useParams<{ sectionKey: string }>();
   const [zoom, setZoom] = useState<string | null>(null);
 
+  const sections = useSections();
   const valid = !!sectionKey && isSectionKey(sectionKey);
-  const section = valid ? SECTIONS.find((s) => s.key === sectionKey)! : null;
+  const showSection = valid ? sections.find((s) => s.key === sectionKey) : undefined;
   const adjacent = valid ? getAdjacentSections(sectionKey) : { prev: null, next: null };
 
   useEffect(() => {
-    if (!section) return;
-    document.title = `${section.title} — Сергиевская · Художественная мастерская`;
+    if (!showSection) return;
+    document.title = `${showSection.title} — Сергиевская · Художественная мастерская`;
     return () => {
       document.title = DEFAULT_TITLE;
     };
-  }, [section]);
+  }, [showSection]);
 
   useEffect(() => {
     setZoom(null);
@@ -44,9 +45,11 @@ export default function SectionPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [zoom]);
 
-  if (!section) {
+  if (!showSection) {
     return <Navigate to="/" replace />;
   }
+
+  const section = showSection;
 
   const { prev, next } = adjacent;
 

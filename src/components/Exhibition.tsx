@@ -1,21 +1,11 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import gallery from "../data/gallery.json";
+import { useSiteContent } from "../context/ContentContext";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-// Curated wall — mixed works across the studio.
-const PICKS: { src: string; cap: string; span: string }[] = [
-  { src: gallery.kartiny[5], cap: "Авторская картина", span: "md:col-span-5 md:row-span-2" },
-  { src: gallery.zhivopis[3], cap: "Живопись с нуля", span: "md:col-span-3" },
-  { src: gallery.mebel[2], cap: "Реставрация комода", span: "md:col-span-4 md:row-span-2" },
-  { src: gallery.masterclass[7], cap: "Вечер с красками", span: "md:col-span-3" },
-  { src: gallery.kartiny[14], cap: "Натюрморт", span: "md:col-span-4" },
-  { src: gallery.masterskaya[6], cap: "В мастерской", span: "md:col-span-4" },
-  { src: gallery.kurs[4], cap: "Курс декора", span: "md:col-span-4" },
-];
-
 export default function Exhibition() {
+  const { exhibitionPicks } = useSiteContent();
   const [zoom, setZoom] = useState<string | null>(null);
 
   return (
@@ -33,7 +23,7 @@ export default function Exhibition() {
         </div>
 
         <div className="grid grid-cols-2 gap-2 sm:gap-3 md:auto-rows-[200px] md:grid-cols-12 md:gap-4">
-          {PICKS.map((p, i) => (
+          {exhibitionPicks.map((p, i) => (
             <motion.button
               key={p.src + i}
               type="button"

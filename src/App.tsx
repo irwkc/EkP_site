@@ -4,10 +4,12 @@ import Home from "./pages/Home";
 import SectionPage from "./pages/SectionPage";
 import PaintingsPage from "./pages/PaintingsPage";
 import PricesPage from "./pages/PricesPage";
+import AdminApp from "./admin/AdminApp";
 
 export default function App() {
   return (
     <Routes>
+      <Route path="/admin/*" element={<AdminApp />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/paintings" element={<PaintingsPage />} />

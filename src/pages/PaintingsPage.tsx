@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
-import {
-  PAINTINGS_FOR_SALE,
-  PAINTINGS_PATH,
-  PRICES_PATH,
-  formatPrice,
-} from "../data/catalog";
+import { useSiteContent } from "../context/ContentContext";
+import { PAINTINGS_PATH, PRICES_PATH, formatPrice } from "../data/catalog";
 import { STUDIO } from "../data/sections";
 import ChapterPaintPour from "../components/ChapterPaintPour";
 import { setScrollIntent } from "../utils/scrollIntent";
@@ -33,7 +29,8 @@ export default function PaintingsPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [zoom]);
 
-  const available = PAINTINGS_FOR_SALE.filter((p) => p.available);
+  const { paintingsForSale } = useSiteContent();
+  const available = paintingsForSale.filter((p) => p.available);
 
   return (
     <main className="relative bg-paper">
@@ -83,7 +80,7 @@ export default function PaintingsPage() {
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {PAINTINGS_FOR_SALE.map((p) => (
+            {paintingsForSale.map((p) => (
               <article
                 key={p.id}
                 className={`flex flex-col border border-line ${p.available ? "" : "opacity-55"}`}

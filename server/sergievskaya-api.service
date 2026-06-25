@@ -1,0 +1,15 @@
+[Unit]
+Description=Sergievskaya site API
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/var/www/sergievskaya-api
+EnvironmentFile=-/var/www/sergievskaya-api/.env
+ExecStart=/usr/bin/node index.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
