@@ -10,8 +10,13 @@ const ROWS = [
 ];
 
 export default function Contact() {
+  const year = new Date().getFullYear();
+
   return (
-    <section id="contact" className="relative bg-ink px-4 pb-8 pt-16 text-paper safe-bottom md:px-10 md:pb-10 md:pt-32">
+    <section
+      id="contact"
+      className="relative bg-ink px-4 pt-16 text-paper pb-[max(1.5rem,env(safe-area-inset-bottom))] md:px-10 md:pb-10 md:pt-32"
+    >
       <div className="mx-auto max-w-[1600px]">
         <p className="label mb-8 text-signal">Свяжитесь с нами</p>
 
@@ -32,7 +37,7 @@ export default function Contact() {
         </motion.a>
 
         <div className="mt-12 grid gap-8 border-t border-paper/15 pt-10 md:mt-16 md:gap-10 md:pt-12 md:grid-cols-[1.2fr_1fr]">
-          <div className="grid grid-cols-1 gap-px bg-paper/15 sm:grid-cols-3">
+          <div className="divide-y divide-paper/10 border-y border-paper/15 md:grid md:grid-cols-3 md:gap-px md:divide-y-0 md:border-y-0 md:bg-paper/15">
             {ROWS.map((r) => (
               <a
                 key={r.label}
@@ -40,7 +45,7 @@ export default function Contact() {
                 target={r.href.startsWith("http") ? "_blank" : undefined}
                 rel="noreferrer"
                 data-cursor
-                className="group bg-ink p-5 transition-colors active:bg-paper/[0.06] md:hover:bg-paper/[0.04]"
+                className="group block py-4 transition-colors active:bg-paper/[0.06] md:bg-ink md:p-5 md:hover:bg-paper/[0.04]"
               >
                 <p className="label text-muted">{r.label}</p>
                 <p className="mt-3 text-base group-active:text-signal sm:text-lg md:sweep md:group-hover:text-signal">
@@ -66,11 +71,26 @@ export default function Contact() {
           </div>
         </div>
 
-        <div className="mt-14 border-t border-paper/15 pt-6 md:mt-20">
-          <div className="flex flex-col gap-4 text-paper/50 md:flex-row md:items-center md:justify-between md:gap-3">
-            <p className="label text-[0.58rem] leading-relaxed md:text-[0.66rem]">
-              © {new Date().getFullYear()} Сергиевская · Художественная мастерская
+        <footer className="mt-12 border-t border-paper/15 pt-8 md:mt-20 md:pt-6">
+          <div className="text-center md:hidden">
+            <p className="label text-[0.62rem] leading-relaxed text-paper/45">
+              © {year} Сергиевская · Художественная мастерская
             </p>
+            <p className="label mt-3 text-paper/40">
+              Рязань · с 2012 · made by{" "}
+              <a
+                href="https://github.com/irwkc"
+                target="_blank"
+                rel="noreferrer"
+                data-cursor
+                className="text-paper/65 transition-colors active:text-signal"
+              >
+                irwkc
+              </a>
+            </p>
+          </div>
+          <div className="hidden text-paper/50 md:flex md:items-center md:justify-between md:gap-3">
+            <p className="label">© {year} Сергиевская · Художественная мастерская</p>
             <p className="label">
               made by{" "}
               <a
@@ -85,7 +105,7 @@ export default function Contact() {
             </p>
             <p className="label">Рязань · с 2012</p>
           </div>
-        </div>
+        </footer>
       </div>
     </section>
   );

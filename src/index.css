@@ -82,6 +82,19 @@ html.lenis body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* contact footer — ink fills iOS home indicator zone */
+#contact::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: env(safe-area-inset-bottom, 0px);
+  background: var(--color-ink);
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* ---- scrollbar base ---- */
 ::-webkit-scrollbar {
   width: 10px;
