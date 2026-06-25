@@ -24,11 +24,13 @@ export default function Nav() {
   const { scrollY } = useScroll();
 
   const menuOpen = menuPhase !== "closed";
+  menuOpenRef.current = menuOpen;
 
   useMotionValueEvent(scrollY, "change", (y) => {
+    if (menuOpenRef.current) return;
     const delta = y - lastY.current;
     setSolid(y > 48);
-    if (Math.abs(delta) > 4 && !menuOpenRef.current) {
+    if (Math.abs(delta) > 4) {
       const isTouch = window.matchMedia("(hover: none)").matches;
       const threshold = isTouch ? 64 : 320;
       navY.set(delta > 0 && y > threshold ? -110 : 0);
@@ -37,13 +39,18 @@ export default function Nav() {
   });
 
   useEffect(() => {
-    menuOpenRef.current = menuPhase === "drawing" || menuPhase === "open";
-    if (menuOpenRef.current) navY.set(0);
-  }, [menuPhase, navY]);
+    if (menuOpen) {
+      navY.jump(0);
+      lastY.current = 0;
+    } else {
+      lastY.current = window.scrollY;
+    }
+  }, [menuOpen, navY]);
 
   useEffect(() => {
     let ticking = false;
     const onScroll = () => {
+      if (menuOpenRef.current) return;
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
@@ -68,31 +75,44 @@ export default function Nav() {
     const locked = menuPhase !== "closed";
     if (!locked) return;
 
-    const scrollY = window.scrollY;
+    const savedScrollY = window.scrollY;
     const lenis = getLenis();
     lenis?.stop();
 
+    const html = document.documentElement;
+    const isTouch = window.matchMedia("(hover: none)").matches;
+
+    html.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = "0";
-    document.body.style.right = "0";
-    document.body.style.width = "100%";
+    html.style.overscrollBehavior = "none";
+    document.body.style.overscrollBehavior = "none";
+
+    if (!isTouch) {
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${savedScrollY}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
+    }
 
     const preventTouch = (e: TouchEvent) => {
-      if ((e.target as HTMLElement).closest("[data-mobile-menu]")) return;
+      const el = e.target as HTMLElement;
+      if (el.closest("[data-mobile-menu]") || el.closest("header")) return;
       e.preventDefault();
     };
     document.addEventListener("touchmove", preventTouch, { passive: false });
 
     return () => {
+      html.style.overflow = "";
       document.body.style.overflow = "";
+      html.style.overscrollBehavior = "";
+      document.body.style.overscrollBehavior = "";
       document.body.style.position = "";
       document.body.style.top = "";
       document.body.style.left = "";
       document.body.style.right = "";
       document.body.style.width = "";
-      window.scrollTo(0, scrollY);
+      if (!isTouch) window.scrollTo(0, savedScrollY);
       lenis?.start();
       document.removeEventListener("touchmove", preventTouch);
     };
@@ -117,15 +137,11 @@ export default function Nav() {
     <>
       <motion.header
         initial={{ opacity: 0 }}
-        animate={{ opacity: menuOpen ? 0 : 1 }}
-        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1], delay: menuOpen ? 0 : 0.2 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
         style={{ y: menuOpen ? 0 : navY }}
         className={`fixed inset-x-0 top-0 z-[90] bg-transparent safe-top ${
-          menuOpen
-            ? "text-paper max-md:pointer-events-none max-md:invisible"
-            : dark
-              ? "text-paper"
-              : "text-ink"
+          menuOpen ? "text-paper" : dark ? "text-paper" : "text-ink"
         }`}
       >
         <nav
@@ -135,7 +151,9 @@ export default function Nav() {
         >
           <Link
             to="/"
-            className="group min-w-0 flex flex-col leading-none"
+            className={`group min-w-0 flex flex-col leading-none ${
+              menuOpen ? "max-md:pointer-events-none max-md:opacity-0" : ""
+            }`}
             onClick={closeAndNavigate}
           >
             <span className="display truncate text-xl tracking-tight transition-colors group-hover:text-signal md:text-2xl">
@@ -193,7 +211,7 @@ export default function Nav() {
               onClick={toggleMenu}
               className={`relative flex h-11 w-11 items-center justify-center rounded-full border transition-colors md:hidden ${
                 menuOpen
-                  ? "border-paper/40 text-paper"
+                  ? "border-signal bg-signal/12 text-signal"
                   : dark
                     ? "border-paper/30 text-paper"
                     : "border-ink/25 text-ink"

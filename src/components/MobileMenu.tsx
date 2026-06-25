@@ -337,7 +337,7 @@ export default function MobileMenu({
   }, [phase, onClosed, onDrawComplete]);
 
   return (
-    <div className="fixed inset-0 z-[80] md:hidden" data-mobile-menu>
+    <div className="fixed inset-0 z-[80] overscroll-none md:hidden" data-mobile-menu>
       <div className="absolute inset-0 bg-paper/40 backdrop-blur-[2px]" aria-hidden />
       <canvas ref={canvasRef} className="absolute inset-0" aria-hidden />
 
@@ -348,19 +348,8 @@ export default function MobileMenu({
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         style={{ pointerEvents: showItems ? "auto" : "none" }}
       >
-        <div className="pointer-events-auto flex items-start justify-end pb-2 pt-[calc(0.75rem+env(safe-area-inset-top))]">
-          <button
-            type="button"
-            aria-label="Закрыть меню"
-            onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-signal bg-signal/12 text-signal active:bg-signal active:text-paper"
-          >
-            ✕
-          </button>
-        </div>
-
-        <nav className="-mt-5 flex flex-1 flex-col justify-center pb-6">
-          <ul className="space-y-0">
+        <nav className="flex flex-1 flex-col items-center justify-center pb-6">
+          <ul className="w-full space-y-0">
             {links.map((l, i) => (
               <motion.li
                 key={l.href}
@@ -375,16 +364,13 @@ export default function MobileMenu({
                 <a
                   href={l.href}
                   onClick={onClose}
-                  className="group flex items-end justify-between gap-3 border-b border-paper/20 py-3 active:opacity-80"
+                  className={`group block py-3 text-center active:opacity-80 ${
+                    i < links.length - 1 ? "border-b border-paper/20" : ""
+                  }`}
                 >
-                  <div className="min-w-0 flex-1">
-                    <span className="label text-[0.5rem] text-paper/70">{l.n}</span>
-                    <span className="display mt-0.5 block text-[clamp(1.05rem,4.6vw,1.4rem)] leading-tight">
-                      {l.label}
-                    </span>
-                  </div>
-                  <span className="serif-italic mb-0.5 w-4 shrink-0 text-right text-lg text-paper/45">
-                    →
+                  <span className="label text-[0.5rem] text-paper/70">{l.n}</span>
+                  <span className="display mt-0.5 block text-[clamp(1.05rem,4.6vw,1.4rem)] leading-tight">
+                    {l.label}
                   </span>
                 </a>
               </motion.li>
@@ -418,7 +404,33 @@ export default function MobileMenu({
               {STUDIO.phone}
             </span>
           </span>
-          <span className="serif-italic mb-0.5 shrink-0 text-lg text-paper/45">→</span>
+          <motion.span
+            className="cta-arrow-neon serif-italic mb-0.5 block shrink-0 text-xl"
+            initial={false}
+            animate={
+              showItems
+                ? reducedMotion.current
+                  ? { opacity: 1, x: 0 }
+                  : { opacity: 1, x: [0, 5, 0] }
+                : { opacity: 0, x: -4 }
+            }
+            transition={
+              showItems && !reducedMotion.current
+                ? {
+                    opacity: { delay: 0.42, duration: 0.35, ease: [0.16, 1, 0.3, 1] },
+                    x: {
+                      delay: 0.55,
+                      duration: 1.35,
+                      repeat: Infinity,
+                      repeatDelay: 2.1,
+                      ease: [0.16, 1, 0.3, 1],
+                    },
+                  }
+                : { duration: 0.25, ease: [0.16, 1, 0.3, 1] }
+            }
+          >
+            →
+          </motion.span>
         </motion.a>
       )}
 
