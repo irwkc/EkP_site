@@ -212,7 +212,8 @@ html.lenis body {
 }
 
 .photo-strip-frame,
-.exhibition-photo {
+.exhibition-photo,
+.catalog-photo {
   position: relative;
   z-index: 20;
 }

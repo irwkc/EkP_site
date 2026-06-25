@@ -3,13 +3,15 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, useMotionValueEvent, useScroll, useSpring } from "motion/react";
 import { getLenis } from "../hooks/useLenis";
 import { STUDIO, isSectionKey } from "../data/sections";
+import { isCatalogPath } from "../data/catalog";
 import MobileMenu from "./MobileMenu";
 
 const LINKS = [
   { href: "/#index", label: "Направления", n: "01" },
   { href: "/#founder", label: "Основатель", n: "02" },
   { href: "/#exhibition", label: "Работы", n: "03" },
-  { href: "/#contact", label: "Контакты", n: "04" },
+  { href: "/#catalog", label: "Каталог", n: "04" },
+  { href: "/#contact", label: "Контакты", n: "05" },
 ];
 
 type MenuPhase = "closed" | "drawing" | "open" | "closing";
@@ -18,6 +20,7 @@ export default function Nav() {
   const location = useLocation();
   const sectionPage =
     location.pathname !== "/" && isSectionKey(location.pathname.slice(1));
+  const catalogPage = isCatalogPath(location.pathname);
 
   const [solid, setSolid] = useState(false);
   const [dark, setDark] = useState(false);
@@ -136,7 +139,7 @@ export default function Nav() {
 
   const closeAndNavigate = () => requestClose();
 
-  const accent = sectionPage && !menuOpen && !dark;
+  const accent = (sectionPage || catalogPage) && !menuOpen && !dark;
 
   return (
     <>

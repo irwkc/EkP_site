@@ -5,6 +5,7 @@ import Marquee, { PhotoStrip } from "../components/Marquee";
 import Index from "../components/Index";
 import Founder from "../components/Founder";
 import Exhibition from "../components/Exhibition";
+import CatalogTeaser from "../components/CatalogTeaser";
 import Contact from "../components/Contact";
 
 const STRIP = [
@@ -23,6 +24,7 @@ export default function Home() {
       <PhotoStrip images={STRIP} />
       <Founder />
       <Exhibition />
+      <CatalogTeaser />
       <Contact />
     </main>
   );
