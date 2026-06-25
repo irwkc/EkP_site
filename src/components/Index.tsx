@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { SECTIONS, getSectionPath } from "../data/sections";
+import { resetScrollPosition } from "../utils/scrollTo";
 
 export default function Index() {
   return (
@@ -25,6 +26,7 @@ export default function Index() {
             <li key={s.key}>
               <Link
                 to={getSectionPath(s.key)}
+                onClick={resetScrollPosition}
                 className="group flex w-full items-start justify-between gap-4 border-b border-line py-5 transition-colors active:bg-paper-dim md:items-center md:py-9"
               >
                 <div className="min-w-0 flex-1">

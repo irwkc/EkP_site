@@ -80,7 +80,7 @@ function drawPour(
 }
 
 /**
- * Paint pour on section open — flows top → bottom, then fades.
+ * Paint pour on section open — full viewport, flows top → bottom, then fades.
  */
 export default function ChapterPaintPour({ chapterKey }: { chapterKey: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -89,8 +89,7 @@ export default function ChapterPaintPour({ chapterKey }: { chapterKey: string })
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const canvas = ref.current;
-    const parent = canvas?.parentElement;
-    if (!canvas || !parent) return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -100,9 +99,8 @@ export default function ChapterPaintPour({ chapterKey }: { chapterKey: string })
     let raf = 0;
 
     const resize = () => {
-      const rect = parent.getBoundingClientRect();
-      const nw = Math.round(rect.width);
-      const nh = Math.round(rect.height);
+      const nw = window.innerWidth;
+      const nh = window.innerHeight;
       if (nw === w && nh === h) return;
       canvas.width = nw;
       canvas.height = nh;
@@ -111,8 +109,7 @@ export default function ChapterPaintPour({ chapterKey }: { chapterKey: string })
     };
 
     resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(parent);
+    window.addEventListener("resize", resize);
 
     const start = performance.now();
 
@@ -135,7 +132,7 @@ export default function ChapterPaintPour({ chapterKey }: { chapterKey: string })
 
     return () => {
       cancelAnimationFrame(raf);
-      ro.disconnect();
+      window.removeEventListener("resize", resize);
     };
   }, [chapterKey]);
 

@@ -97,6 +97,17 @@ function animateScrollTo(targetY: number, durationMs: number) {
   activeRaf = requestAnimationFrame(step);
 }
 
+/** Reset scroll to top — cancels RAF scroll and syncs Lenis if active. */
+export function resetScrollPosition() {
+  cancelActiveScroll();
+  const lenis = getLenis();
+  if (lenis) {
+    lenis.scrollTo(0, { immediate: true, force: true });
+    return;
+  }
+  window.scrollTo(0, 0);
+}
+
 /**
  * Instant scroll to a section (no animation). Used when arriving via router hash.
  * Retries until the target is in the DOM (mobile route transitions).

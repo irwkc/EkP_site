@@ -52,9 +52,9 @@ export default function SectionPage() {
 
   return (
     <main className="relative bg-paper">
+      <ChapterPaintPour chapterKey={section.key} />
       <section className="relative border-b border-line">
-        <div className="relative min-h-[50vh] overflow-hidden md:min-h-0">
-          <ChapterPaintPour chapterKey={section.key} />
+        <div className="relative md:min-h-0">
           <div className="relative z-[1] mx-auto max-w-[1600px] px-4 pb-12 pt-[calc(5.5rem+env(safe-area-inset-top))] md:px-10 md:pb-16 md:pt-32">
             <Link
               to="/"
