@@ -7,7 +7,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 function Line({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
-    <span className="reveal-mask block">
+    <span className="hero-line-mask block">
       <motion.span
         className="inline-block"
         initial={{ y: "115%" }}
@@ -63,15 +63,15 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="display relative z-10 text-ink"
           >
-            <span className="hero-title-line block leading-[0.88]">
+            <span className="hero-title-line block">
               <Line delay={0.2}>Холст,</Line>
             </span>
-            <span className="hero-title-line block pl-[10vw] leading-[0.88] sm:pl-[6vw]">
+            <span className="hero-title-line block pl-[10vw] sm:pl-[6vw]">
               <Line delay={0.3}>
                 <span className="serif-italic text-signal">краски</span>
               </Line>
             </span>
-            <span className="hero-title-line block leading-[0.88]">
+            <span className="hero-title-line block">
               <Line delay={0.4}>
                 <span className="outline">и&nbsp;ты</span>
               </Line>
