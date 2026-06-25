@@ -82,17 +82,15 @@ html.lenis body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* contact footer — ink fills iOS home indicator zone */
-#contact::after {
-  content: "";
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: env(safe-area-inset-bottom, 0px);
-  background: var(--color-ink);
-  pointer-events: none;
-  z-index: 1;
+/* hero — scale title by viewport height so short Safari windows don't clip */
+.hero-title-line {
+  font-size: clamp(3.75rem, min(19vw, 13vh), 12.5rem);
+}
+
+@media (max-height: 820px) and (min-width: 768px) {
+  .hero-title-line {
+    font-size: clamp(2.75rem, min(14vw, 11vh), 7rem);
+  }
 }
 
 /* ---- scrollbar base ---- */
@@ -187,6 +185,7 @@ html.lenis body {
   top: 0;
   left: 0;
   z-index: 10;
+  width: 100%;
   pointer-events: none;
 }
 

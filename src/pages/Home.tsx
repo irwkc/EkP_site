@@ -15,7 +15,7 @@ const STRIP = [
 
 export default function Home() {
   return (
-    <main id="top" className="relative">
+    <main id="top" className="relative overflow-x-clip overflow-y-clip">
       <PaintTrail />
       <Hero />
       <Marquee />

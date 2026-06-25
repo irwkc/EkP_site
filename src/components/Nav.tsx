@@ -7,7 +7,7 @@ import MobileMenu from "./MobileMenu";
 
 const LINKS = [
   { href: "/#index", label: "Направления", n: "01" },
-  { href: "/#founder", label: "Об авторе", n: "02" },
+  { href: "/#founder", label: "Основатель", n: "02" },
   { href: "/#exhibition", label: "Работы", n: "03" },
   { href: "/#contact", label: "Контакты", n: "04" },
 ];
@@ -54,14 +54,13 @@ export default function Nav() {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
-        const contact = document.getElementById("contact");
-        const sectionCta = document.getElementById("section-cta");
         const navH = 72;
+        const darkSectionIds = ["exhibition", "contact", "section-cta"];
         setDark(
-          !!(
-            (contact && contact.getBoundingClientRect().top < navH) ||
-            (sectionCta && sectionCta.getBoundingClientRect().top < navH)
-          )
+          darkSectionIds.some((id) => {
+            const el = document.getElementById(id);
+            return !!el && el.getBoundingClientRect().top < navH;
+          })
         );
         ticking = false;
       });

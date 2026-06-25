@@ -12,7 +12,8 @@ export default function PaintTrail() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const canvas = ref.current;
-    if (!canvas) return;
+    const main = canvas?.closest("main");
+    if (!canvas || !main) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -23,19 +24,25 @@ export default function PaintTrail() {
     let ly = 0;
 
     const ensureSize = () => {
-      const nw = document.documentElement.clientWidth;
-      const nh = Math.max(
-        document.documentElement.scrollHeight,
-        window.innerHeight
-      );
+      const nw = main.clientWidth;
+      // Use main height only — document scrollHeight includes this canvas and
+      // creates a feedback loop that adds empty scroll past the footer (Safari).
+      const nh = main.offsetHeight;
       if (nw === w && nh === h) return;
+
       const prev = document.createElement("canvas");
       prev.width = canvas.width || 1;
       prev.height = canvas.height || 1;
       prev.getContext("2d")!.drawImage(canvas, 0, 0);
-      canvas.width = nw;
-      canvas.height = nh;
-      ctx.drawImage(prev, 0, 0);
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(nw * dpr);
+      canvas.height = Math.round(nh * dpr);
+      canvas.style.width = `${nw}px`;
+      canvas.style.height = `${nh}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.drawImage(prev, 0, 0, prev.width, prev.height, 0, 0, nw, nh);
+
       w = nw;
       h = nh;
     };
@@ -94,8 +101,9 @@ export default function PaintTrail() {
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", ensureSize);
+
     const ro = new ResizeObserver(ensureSize);
-    ro.observe(document.body);
+    ro.observe(main);
 
     return () => {
       window.removeEventListener("mousemove", onMove);
@@ -106,4 +114,4 @@ export default function PaintTrail() {
   }, []);
 
   return <canvas ref={ref} className="paint-trail" aria-hidden />;
-}
+};

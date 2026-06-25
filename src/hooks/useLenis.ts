@@ -19,6 +19,7 @@ export function useLenis(enabled = true) {
   useEffect(() => {
     if (!enabled) return;
     if (window.matchMedia("(hover: none)").matches) return;
+    // Safari desktop: native scroll + scrollToId() fallback — Lenis glitches here.
     if (isSafari()) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 

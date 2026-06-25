@@ -94,7 +94,7 @@ export default function Founder() {
           </div>
 
           <div>
-            <p className="label mb-6 text-signal">Об авторе</p>
+            <p className="label mb-6 text-signal">Основатель</p>
             <motion.h2
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}

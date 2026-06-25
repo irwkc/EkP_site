@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { STUDIO } from "../data/sections";
+import { scrollToId } from "../utils/scrollTo";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -31,9 +32,9 @@ export default function Hero() {
   return (
     <section
       ref={ref}
-      className="relative flex min-h-[100svh] w-full flex-col overflow-hidden"
+      className="relative w-full overflow-x-clip"
     >
-      <div className="mx-auto flex min-h-[100svh] w-full max-w-[1600px] flex-col justify-between px-4 pb-8 pt-[calc(5.25rem+env(safe-area-inset-top))] md:px-10 md:pb-10 md:pt-32">
+      <div className="mx-auto flex min-h-[100svh] w-full max-w-[1600px] flex-col justify-between px-4 pb-8 pt-[calc(5.25rem+env(safe-area-inset-top))] md:px-10 md:pb-10 md:pt-28 lg:pt-32">
         {/* top meta — compact on mobile */}
         <motion.div style={{ opacity: fade }} className="shrink-0">
           <p className="label text-ink-soft md:hidden">
@@ -54,7 +55,7 @@ export default function Hero() {
         {/* headline — focal point on mobile */}
         <motion.div
           style={{ y: txtY }}
-          className="flex flex-1 flex-col justify-center py-6 md:py-10"
+          className="flex flex-1 flex-col justify-center py-4 md:py-6 lg:py-10"
         >
           <motion.h1
             initial={{ opacity: 0 }}
@@ -62,15 +63,15 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="display relative z-10 text-ink"
           >
-            <span className="block text-[clamp(3.75rem,19vw,12.5rem)] leading-[0.88]">
+            <span className="hero-title-line block leading-[0.88]">
               <Line delay={0.2}>Холст,</Line>
             </span>
-            <span className="block pl-[10vw] text-[clamp(3.75rem,19vw,12.5rem)] leading-[0.88] sm:pl-[6vw]">
+            <span className="hero-title-line block pl-[10vw] leading-[0.88] sm:pl-[6vw]">
               <Line delay={0.3}>
                 <span className="serif-italic text-signal">краски</span>
               </Line>
             </span>
-            <span className="block text-[clamp(3.75rem,19vw,12.5rem)] leading-[0.88]">
+            <span className="hero-title-line block leading-[0.88]">
               <Line delay={0.4}>
                 <span className="outline">и&nbsp;ты</span>
               </Line>
@@ -95,6 +96,10 @@ export default function Hero() {
 
           <motion.a
             href="#index"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToId("index");
+            }}
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.95, duration: 0.9 }}
