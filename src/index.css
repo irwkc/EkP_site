@@ -179,7 +179,7 @@ html.lenis body {
   overflow: hidden;
 }
 
-/* paint layer — above page content, except #founder-portrait */
+/* paint layer — above section bg, below photos and #founder-portrait */
 .paint-trail {
   position: absolute;
   top: 0;
@@ -196,6 +196,16 @@ html.lenis body {
 
 #founder-portrait {
   z-index: 20;
+}
+
+.photo-strip-frame,
+.exhibition-photo {
+  position: relative;
+  z-index: 20;
+}
+
+#photo-strip {
+  position: relative;
 }
 
 /* custom cursor — a single drop of pigment */

@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 /**
  * Persistent paint trail — canvas scrolls with the page in document coordinates.
- * Desktop only; sits above page content (z-10), #founder-portrait at z-20.
+ * Desktop only; z-10 — above strip background, below photos and #founder-portrait.
  */
 export default function PaintTrail() {
   const ref = useRef<HTMLCanvasElement>(null);

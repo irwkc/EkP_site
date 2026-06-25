@@ -19,8 +19,9 @@ export default function Exhibition() {
   const [zoom, setZoom] = useState<string | null>(null);
 
   return (
-    <section id="exhibition" className="relative bg-ink px-4 py-16 text-paper md:px-10 md:py-36">
-      <div className="mx-auto max-w-[1600px]">
+    <section id="exhibition" className="relative px-4 py-16 text-paper md:px-10 md:py-36">
+      <div className="pointer-events-none absolute inset-0 bg-ink" aria-hidden />
+      <div className="relative mx-auto max-w-[1600px]">
         <div className="mb-10 flex flex-col gap-4 md:mb-14 md:flex-row md:items-end md:justify-between md:gap-6">
           <h2 className="display text-[clamp(2.5rem,10vw,7rem)] leading-[0.92]">
             Избранное
@@ -42,7 +43,7 @@ export default function Exhibition() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "0px 0px -12% 0px" }}
               transition={{ duration: 0.7, ease: EASE, delay: (i % 3) * 0.08 }}
-              className={`group relative aspect-[4/5] overflow-hidden border border-paper/15 md:aspect-auto ${p.span}`}
+              className={`exhibition-photo group relative z-20 aspect-[4/5] overflow-hidden border border-paper/15 md:aspect-auto ${p.span}`}
             >
               <img
                 src={p.src}
