@@ -221,9 +221,51 @@ html.lenis body {
 .photo-strip-frame,
 .exhibition-photo,
 .catalog-photo,
-.index-sticky-preview {
+.index-preview-card {
   position: relative;
   z-index: 20;
+}
+
+.index-picker-stage {
+  position: relative;
+}
+
+.index-picker-slot {
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.index-preview-sticky {
+  position: sticky;
+  align-self: start;
+}
+
+.index-picker-row {
+  transition: background-color 0.25s var(--ease-art);
+}
+
+@media (hover: hover) {
+  .index-picker-row:hover {
+    background-color: color-mix(in srgb, var(--color-paper-dim) 55%, transparent);
+  }
+}
+
+.index-picker-row:focus-visible {
+  background-color: color-mix(in srgb, var(--color-paper-dim) 70%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--color-signal) 45%, transparent);
+  outline-offset: -1px;
+}
+
+.index-picker-arrow,
+.index-picker-row [data-picker-title],
+.index-picker-row [data-picker-index] {
+  transition:
+    color 0.3s var(--ease-art),
+    opacity 0.3s var(--ease-art);
+}
+
+.index-progress-bar {
+  will-change: transform, opacity;
 }
 
 .index-picker-item {
@@ -232,6 +274,14 @@ html.lenis body {
 
 .index-picker-list {
   scroll-snap-type: y proximity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .index-picker-row [data-picker-title],
+  .index-picker-arrow,
+  .index-preview-card img {
+    transition: none !important;
+  }
 }
 
 #photo-strip {
