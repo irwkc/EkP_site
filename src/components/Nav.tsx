@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, useMotionValueEvent, useScroll, useSpring } from "motion/react";
 import { getLenis } from "../hooks/useLenis";
-import { STUDIO } from "../data/sections";
+import { STUDIO, isSectionKey } from "../data/sections";
 import MobileMenu from "./MobileMenu";
 
 const LINKS = [
@@ -15,6 +15,10 @@ const LINKS = [
 type MenuPhase = "closed" | "drawing" | "open" | "closing";
 
 export default function Nav() {
+  const location = useLocation();
+  const sectionPage =
+    location.pathname !== "/" && isSectionKey(location.pathname.slice(1));
+
   const [solid, setSolid] = useState(false);
   const [dark, setDark] = useState(false);
   const [menuPhase, setMenuPhase] = useState<MenuPhase>("closed");
@@ -132,6 +136,8 @@ export default function Nav() {
 
   const closeAndNavigate = () => requestClose();
 
+  const accent = sectionPage && !menuOpen && !dark;
+
   return (
     <>
       <motion.header
@@ -140,7 +146,7 @@ export default function Nav() {
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
         style={{ y: menuOpen ? 0 : navY }}
         className={`fixed inset-x-0 top-0 z-[90] bg-transparent safe-top ${
-          menuOpen ? "text-paper" : dark ? "text-paper" : "text-ink"
+          menuOpen ? "text-paper" : dark ? "text-paper" : accent ? "text-signal" : "text-ink"
         }`}
       >
         <nav
@@ -155,12 +161,16 @@ export default function Nav() {
             }`}
             onClick={closeAndNavigate}
           >
-            <span className="display truncate text-xl tracking-tight transition-colors group-hover:text-signal md:text-2xl">
+            <span className="display truncate text-xl tracking-tight transition-colors group-hover:text-signal-deep md:text-2xl">
               Сергиевская
             </span>
             <span
               className={`label mt-1 text-[0.55rem] transition-colors ${
-                menuOpen || dark ? "text-paper/50" : "text-muted"
+                menuOpen || dark
+                  ? "text-paper/50"
+                  : accent
+                    ? "text-signal/55"
+                    : "text-muted"
               }`}
             >
               Мастерская · Рязань
@@ -177,12 +187,12 @@ export default function Nav() {
               >
                 <span
                   className={`label text-[0.58rem] transition-colors ${
-                    dark ? "text-paper/40" : "text-muted"
-                  } group-hover:text-signal`}
+                    dark ? "text-paper/40" : accent ? "text-signal/50" : "text-muted"
+                  } group-hover:text-signal-deep`}
                 >
                   {l.n}
                 </span>
-                <span className="sweep text-sm transition-colors group-hover:text-signal">
+                <span className="sweep text-sm transition-colors group-hover:text-signal-deep">
                   {l.label}
                 </span>
               </a>
@@ -194,7 +204,7 @@ export default function Nav() {
               href={STUDIO.phoneHref}
               data-cursor
               className={`group relative hidden overflow-hidden border px-4 py-2 sm:block md:px-5 md:py-2.5 ${
-                dark ? "border-paper/40" : "border-ink"
+                dark ? "border-paper/40" : accent ? "border-signal" : "border-ink"
               }`}
             >
               <span className="relative z-10 text-sm transition-colors duration-300 group-hover:text-paper">
@@ -213,7 +223,9 @@ export default function Nav() {
                   ? "border-signal bg-signal/12 text-signal"
                   : dark
                     ? "border-paper/30 text-paper"
-                    : "border-ink/25 text-ink"
+                    : accent
+                      ? "border-signal/40 text-signal"
+                      : "border-ink/25 text-ink"
               }`}
             >
               <span
@@ -236,10 +248,15 @@ export default function Nav() {
         </nav>
 
         <motion.div
-          animate={{ scaleX: solid ? 1 : 0, opacity: dark ? 0.25 : 0.16 }}
+          animate={{
+            scaleX: solid ? 1 : 0,
+            opacity: dark ? 0.25 : accent ? 0.22 : 0.16,
+          }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           style={{ transformOrigin: "0% 50%" }}
-          className={`hidden h-px w-full md:block ${dark ? "bg-paper" : "bg-ink"}`}
+          className={`hidden h-px w-full md:block ${
+            dark ? "bg-paper" : accent ? "bg-signal" : "bg-ink"
+          }`}
         />
       </motion.header>
 

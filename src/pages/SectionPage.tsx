@@ -9,6 +9,7 @@ import {
   isSectionKey,
 } from "../data/sections";
 import ChapterPaintPour from "../components/ChapterPaintPour";
+import ChapterGallery from "../components/ChapterGallery";
 import { setScrollIntent } from "../utils/scrollIntent";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -94,84 +95,58 @@ export default function SectionPage() {
         <p className="label mb-8 text-muted md:mb-10">
           {section.images.length} работ в собрании
         </p>
-        <div className="chapter-gallery columns-2 gap-3 md:columns-3 md:gap-4 lg:columns-4">
-          {section.images.map((src, i) => (
-            <button
-              key={src}
-              type="button"
-              onClick={() => setZoom(src)}
-              className="chapter-gallery-item mb-3 block w-full overflow-hidden border border-line md:mb-4"
-            >
-              <img
-                src={src}
-                alt={`${section.title} — работа ${i + 1}`}
-                loading={i < 8 ? "eager" : "lazy"}
-                decoding="async"
-                className="w-full object-cover"
-              />
-            </button>
-          ))}
-        </div>
+        <ChapterGallery
+          images={section.images}
+          title={section.title}
+          sectionKey={section.key}
+          onPick={setZoom}
+        />
       </section>
 
       <section className="border-t border-line bg-paper-dim">
-        <div className="mx-auto grid max-w-[1600px] grid-cols-2 divide-x divide-line">
-          {prev ? (
+        <div className="mx-auto max-w-[1600px] divide-y divide-line md:grid md:grid-cols-2 md:divide-x md:divide-y-0">
+          {prev && (
             <Link
               to={getSectionPath(prev.key)}
-              className="group flex flex-col gap-2 px-4 py-8 active:bg-paper md:px-10 md:py-12"
+              className="group flex flex-col gap-1 px-4 py-5 active:bg-paper md:gap-2 md:px-10 md:py-12"
             >
-              <span className="label text-muted">← Предыдущее</span>
-              <span className="display text-xl transition-colors group-active:text-signal md:text-3xl md:group-hover:text-signal">
+              <span className="label text-[0.58rem] text-muted">← Предыдущее</span>
+              <span className="display text-lg leading-tight transition-colors group-active:text-signal md:text-3xl md:group-hover:text-signal">
                 {prev.title}
               </span>
             </Link>
-          ) : (
-            <div />
           )}
-          {next ? (
+          {next && (
             <Link
               to={getSectionPath(next.key)}
-              className="group flex flex-col items-end gap-2 px-4 py-8 text-right active:bg-paper md:px-10 md:py-12"
+              className="group flex flex-col gap-1 px-4 py-5 active:bg-paper md:items-end md:gap-2 md:px-10 md:py-12 md:text-right"
             >
-              <span className="label text-muted">Следующее →</span>
-              <span className="display text-xl transition-colors group-active:text-signal md:text-3xl md:group-hover:text-signal">
+              <span className="label text-[0.58rem] text-muted">Следующее →</span>
+              <span className="display text-lg leading-tight transition-colors group-active:text-signal md:text-3xl md:group-hover:text-signal">
                 {next.title}
               </span>
             </Link>
-          ) : (
-            <div />
           )}
         </div>
       </section>
 
       <section
         id="section-cta"
-        className="border-t border-line bg-ink px-4 py-14 text-paper safe-bottom md:px-10 md:py-20"
+        className="border-t border-line bg-ink px-4 pt-8 text-paper md:px-10 md:pt-16 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] md:pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))]"
       >
-        <div className="mx-auto flex max-w-[1600px] flex-col gap-8 md:flex-row md:items-end md:justify-between">
+        <div className="mx-auto flex max-w-[1600px] flex-col gap-5 sm:flex-row sm:items-center sm:justify-between md:items-end">
           <div>
-            <p className="label text-signal">Запись</p>
-            <h2 className="display mt-4 text-[clamp(2rem,8vw,4rem)] leading-tight">
+            <p className="label text-[0.58rem] text-signal">Запись</p>
+            <h2 className="display mt-2 text-[clamp(1.65rem,6.5vw,3.5rem)] leading-[0.95] md:mt-3">
               Готовы взять кисть?
             </h2>
           </div>
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <a
-              href={STUDIO.phoneHref}
-              className="flex items-center justify-center border border-paper/30 px-8 py-4 text-lg active:border-signal active:bg-signal"
-            >
-              {STUDIO.phone}
-            </a>
-            <Link
-              to="/"
-              state={{ scrollTo: "contact" }}
-              onClick={() => setScrollIntent("contact")}
-              className="label flex items-center justify-center border border-paper/30 px-8 py-4 active:border-signal"
-            >
-              Контакты
-            </Link>
-          </div>
+          <a
+            href={STUDIO.phoneHref}
+            className="label inline-flex shrink-0 items-center justify-center border border-paper/30 px-8 py-3.5 transition-colors active:border-signal active:bg-signal md:px-10 md:py-4"
+          >
+            Записаться
+          </a>
         </div>
       </section>
 
