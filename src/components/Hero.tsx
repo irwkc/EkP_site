@@ -64,11 +64,11 @@ export default function Hero() {
             className="display relative z-10 text-ink"
           >
             <span className="hero-title-line block">
-              <Line delay={0.2}>Холст,</Line>
+              <Line delay={0.2}>Интерьер,</Line>
             </span>
-            <span className="hero-title-line block pl-[10vw] sm:pl-[6vw]">
+            <span className="hero-title-line block pl-3 sm:pl-[6vw]">
               <Line delay={0.3}>
-                <span className="serif-italic text-signal">краски</span>
+                <span className="serif-italic text-signal">как искусство</span>
               </Line>
             </span>
             <span className="hero-title-line block">

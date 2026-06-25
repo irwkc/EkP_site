@@ -32,11 +32,31 @@ export default function Nav() {
 
   const menuOpen = menuPhase !== "closed";
   menuOpenRef.current = menuOpen;
+  const indexInViewRef = useRef(false);
+
+  useEffect(() => {
+    const el = document.getElementById("index");
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        indexInViewRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.15 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useMotionValueEvent(scrollY, "change", (y) => {
     if (menuOpenRef.current) return;
     const delta = y - lastY.current;
     setSolid(y > 48);
+    if (indexInViewRef.current) {
+      navY.set(0);
+      lastY.current = y;
+      return;
+    }
     if (Math.abs(delta) > 4) {
       const isTouch = window.matchMedia("(hover: none)").matches;
       const threshold = isTouch ? 64 : 320;

@@ -90,6 +90,13 @@ html.lenis body {
   line-height: 1.02;
 }
 
+@media (max-width: 767px) {
+  .hero-title-line {
+    font-size: clamp(2.35rem, min(11.5vw, 8.5vh), 3.15rem);
+    line-height: 1.05;
+  }
+}
+
 /* reveal animation mask — extra room for commas, italic, descenders */
 .hero-line-mask {
   display: block;
@@ -213,9 +220,18 @@ html.lenis body {
 
 .photo-strip-frame,
 .exhibition-photo,
-.catalog-photo {
+.catalog-photo,
+.index-sticky-preview {
   position: relative;
   z-index: 20;
+}
+
+.index-picker-item {
+  scroll-snap-align: center;
+}
+
+.index-picker-list {
+  scroll-snap-type: y proximity;
 }
 
 #photo-strip {
