@@ -230,14 +230,24 @@ html.lenis body {
   position: relative;
 }
 
-.index-picker-slot {
-  max-width: 34rem;
-  margin-inline: auto;
+.index-mobile-preview {
+  margin-bottom: 0.25rem;
 }
 
-.index-preview-sticky {
+.index-preview-col {
+  align-self: start;
+}
+
+.index-preview-pin {
   position: sticky;
   align-self: start;
+  z-index: 10;
+}
+
+@media (min-width: 768px) {
+  .index-picker-track {
+    min-height: calc(100svh - 7rem);
+  }
 }
 
 .index-picker-row {
@@ -256,30 +266,22 @@ html.lenis body {
   outline-offset: -1px;
 }
 
-.index-picker-arrow,
 .index-picker-row [data-picker-title],
-.index-picker-row [data-picker-index] {
+.index-picker-row [data-picker-index],
+.index-picker-row [data-picker-arrow] {
   transition:
     color 0.3s var(--ease-art),
-    opacity 0.3s var(--ease-art);
+    opacity 0.3s var(--ease-art),
+    transform 0.3s var(--ease-art);
 }
 
 .index-progress-bar {
   will-change: transform, opacity;
 }
 
-.index-picker-item {
-  scroll-snap-align: center;
-}
-
-.index-picker-list {
-  scroll-snap-type: y proximity;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .index-picker-row [data-picker-title],
-  .index-picker-arrow,
-  .index-preview-card img {
+  .index-picker-row [data-picker-arrow] {
     transition: none !important;
   }
 }
