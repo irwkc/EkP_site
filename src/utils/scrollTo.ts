@@ -98,6 +98,55 @@ function animateScrollTo(targetY: number, durationMs: number) {
 }
 
 /**
+ * Instant scroll to a section (no animation). Used when arriving via router hash.
+ * Retries until the target is in the DOM (mobile route transitions).
+ */
+export function jumpToId(id: string, onDone?: () => void) {
+  let attempts = 0;
+  let raf = 0;
+
+  const done = () => onDone?.();
+
+  const apply = (el: HTMLElement) => {
+    cancelActiveScroll();
+
+    const lenis = getLenis();
+    if (lenis) {
+      lenis.scrollTo(el, { immediate: true });
+      done();
+      return;
+    }
+
+    const scroll = () => {
+      const y = Math.max(0, el.getBoundingClientRect().top + window.scrollY);
+      window.scrollTo(0, y);
+    };
+
+    scroll();
+    // iOS Safari may apply layout one frame later after route change.
+    requestAnimationFrame(() => {
+      scroll();
+      done();
+    });
+  };
+
+  const go = () => {
+    const el = document.getElementById(id);
+    if (el) {
+      apply(el);
+      return;
+    }
+    if (attempts++ < 60) {
+      raf = requestAnimationFrame(go);
+    } else {
+      done();
+    }
+  };
+
+  go();
+}
+
+/**
  * Smooth scroll to a section. Uses Lenis when active (Chrome/Firefox desktop).
  * Falls back to RAF animation on Safari desktop, touch devices, and reduced-motion
  * — Lenis is intentionally disabled there (see useLenis).

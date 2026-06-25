@@ -80,15 +80,13 @@ function drawPour(
 }
 
 /**
- * Paint pour synced with chapter wipe — flows top → bottom, then fades.
- * Touch devices only (mobile alternative to desktop paint trail).
+ * Paint pour on section open — flows top → bottom, then fades.
  */
 export default function ChapterPaintPour({ chapterKey }: { chapterKey: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (!window.matchMedia("(hover: none)").matches) return;
 
     const canvas = ref.current;
     const parent = canvas?.parentElement;

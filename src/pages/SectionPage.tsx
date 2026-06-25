@@ -9,6 +9,7 @@ import {
   isSectionKey,
 } from "../data/sections";
 import ChapterPaintPour from "../components/ChapterPaintPour";
+import { setScrollIntent } from "../utils/scrollIntent";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const DEFAULT_TITLE =
@@ -55,7 +56,9 @@ export default function SectionPage() {
           <ChapterPaintPour chapterKey={section.key} />
           <div className="relative z-[1] mx-auto max-w-[1600px] px-4 pb-12 pt-[calc(5.5rem+env(safe-area-inset-top))] md:px-10 md:pb-16 md:pt-32">
             <Link
-              to="/#index"
+              to="/"
+              state={{ scrollTo: "index" }}
+              onClick={() => setScrollIntent("index")}
               className="label inline-flex items-center gap-2 text-muted transition-colors active:text-signal"
             >
               ← Все направления
@@ -161,7 +164,9 @@ export default function SectionPage() {
               {STUDIO.phone}
             </a>
             <Link
-              to="/#contact"
+              to="/"
+              state={{ scrollTo: "contact" }}
+              onClick={() => setScrollIntent("contact")}
               className="label flex items-center justify-center border border-paper/30 px-8 py-4 active:border-signal"
             >
               Контакты
