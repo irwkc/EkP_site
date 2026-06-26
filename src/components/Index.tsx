@@ -1,11 +1,6 @@
-import { useCallback, useRef, useState, type RefObject } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  AnimatePresence,
-  motion,
-  useReducedMotion,
-  type PanInfo,
-} from "motion/react";
+import { motion, useReducedMotion, type PanInfo } from "motion/react";
 import { getSectionPath, type Section } from "../data/sections";
 import { useSections } from "../hooks/useSections";
 import { resetScrollPosition } from "../utils/scrollTo";
@@ -13,9 +8,9 @@ import { resetScrollPosition } from "../utils/scrollTo";
 const STACK_DEPTH = 3;
 const SWIPE_THRESHOLD = 56;
 const SWIPE_VELOCITY = 420;
+const SWIPE_COOLDOWN_MS = 280;
 
 type ExitVector = { x: number; y: number; rotate: number };
-type DeckDirection = "forward" | "back" | "jump";
 
 function sectionPreview(section: Section) {
   return section.images[0] ?? null;
@@ -47,29 +42,93 @@ function deckExitVector(direction: "forward" | "back", info?: PanInfo): ExitVect
   };
 }
 
+function CardFace({
+  section,
+  total,
+  showHint,
+  showCta,
+}: {
+  section: Section;
+  total: number;
+  showHint?: boolean;
+  showCta?: boolean;
+}) {
+  const src = sectionPreview(section);
+  const indexNum = Number.parseInt(section.index, 10);
+
+  return (
+    <div className="relative aspect-[3/4] w-full overflow-hidden border border-line bg-paper-dim shadow-[0_24px_60px_-20px_rgba(20,16,9,0.35)]">
+      {src ? (
+        <img
+          src={src}
+          alt={section.title}
+          loading="eager"
+          decoding="async"
+          draggable={false}
+          className="pointer-events-none h-full w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-paper-dim">
+          <span className="label text-muted">Скоро</span>
+        </div>
+      )}
+
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/88 via-ink/25 to-ink/10"
+        aria-hidden
+      />
+
+      {showHint && (
+        <div
+          className="label pointer-events-none absolute inset-x-0 top-0 flex items-center justify-center gap-3 py-3 text-paper/45"
+          aria-hidden
+        >
+          <span>←</span>
+          <span>свайп</span>
+          <span>→</span>
+        </div>
+      )}
+
+      <div className="absolute inset-x-0 bottom-0 p-4">
+        <p className="label mb-2 text-paper/65">
+          {String(indexNum).padStart(2, "0")} / {String(total).padStart(2, "0")}
+        </p>
+        <p className="label text-signal">{section.kicker}</p>
+        <h3 className="display mt-1 text-[clamp(1.65rem,7.5vw,2.25rem)] leading-[0.95] text-paper">
+          {section.title}
+        </h3>
+
+        {showCta && (
+          <Link
+            to={getSectionPath(section.key)}
+            onClick={resetScrollPosition}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="label mt-4 inline-flex items-center gap-2 border border-paper/35 bg-paper/10 px-4 py-2.5 text-paper backdrop-blur-sm transition-colors duration-200 active:border-signal active:bg-signal active:text-paper"
+          >
+            Смотреть работы
+            <span aria-hidden>↗</span>
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function DeckCard({
   section,
   depth,
   isTop,
   total,
-  exitVectorRef,
-  directionRef,
-  skipExitRef,
+  reduceMotion,
   onDismiss,
 }: {
   section: Section;
   depth: number;
   isTop: boolean;
   total: number;
-  exitVectorRef: RefObject<ExitVector>;
-  directionRef: RefObject<DeckDirection>;
-  skipExitRef: RefObject<boolean>;
+  reduceMotion: boolean;
   onDismiss: (info: PanInfo) => void;
 }) {
-  const reduceMotion = useReducedMotion();
-  const src = sectionPreview(section);
-  const indexNum = Number.parseInt(section.index, 10);
-
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (!isTop) return;
     const { offset, velocity } = info;
@@ -83,42 +142,18 @@ function DeckCard({
     }
   };
 
-  const topInitial =
-    directionRef.current === "back"
-      ? { x: -72, opacity: 0.88, scale: 0.98 }
-      : { scale: 0.97, y: 12, opacity: 0.9 };
-
-  const cardVariants = {
-    inStack: {
-      x: 0,
-      scale: 1 - depth * 0.045,
-      y: depth * 14,
-      rotate: depth * -2.5,
-      opacity: 1 - depth * 0.1,
-    },
-    exit: () => {
-      if (skipExitRef.current) {
-        return { opacity: 0, transition: { duration: 0.12 } };
-      }
-      const v = exitVectorRef.current ?? { x: -420, y: 0, rotate: -12 };
-      return {
-        x: v.x,
-        y: v.y,
-        rotate: v.rotate,
-        opacity: 0,
-        transition: { type: "spring" as const, stiffness: 320, damping: 32 },
-      };
-    },
-  };
-
   return (
     <motion.div
       className="absolute inset-x-0 top-0"
       style={{ zIndex: STACK_DEPTH - depth, touchAction: isTop ? "pan-y" : "none" }}
-      variants={cardVariants}
-      initial={isTop ? topInitial : false}
-      animate="inStack"
-      exit="exit"
+      initial={false}
+      animate={{
+        x: 0,
+        scale: 1 - depth * 0.045,
+        y: depth * 14,
+        rotate: depth * -2.5,
+        opacity: 1 - depth * 0.1,
+      }}
       transition={{ type: "spring", stiffness: 440, damping: 36 }}
       drag={isTop && !reduceMotion ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
@@ -136,60 +171,43 @@ function DeckCard({
           : undefined
       }
     >
-      <div className="relative aspect-[3/4] w-full overflow-hidden border border-line bg-paper-dim shadow-[0_24px_60px_-20px_rgba(20,16,9,0.35)]">
-        {src ? (
-          <img
-            src={src}
-            alt={section.title}
-            loading={depth === 0 ? "eager" : "lazy"}
-            decoding="async"
-            draggable={false}
-            className="pointer-events-none h-full w-full object-cover"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-paper-dim">
-            <span className="label text-muted">Скоро</span>
-          </div>
-        )}
+      <CardFace
+        section={section}
+        total={total}
+        showHint={isTop && !reduceMotion}
+        showCta={isTop}
+      />
+    </motion.div>
+  );
+}
 
-        <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/88 via-ink/25 to-ink/10"
-          aria-hidden
-        />
-
-        {isTop && !reduceMotion && (
-          <div
-            className="label pointer-events-none absolute inset-x-0 top-0 flex items-center justify-center gap-3 py-3 text-paper/45"
-            aria-hidden
-          >
-            <span>←</span>
-            <span>свайп</span>
-            <span>→</span>
-          </div>
-        )}
-
-        <div className="absolute inset-x-0 bottom-0 p-4">
-          <p className="label mb-2 text-paper/65">
-            {String(indexNum).padStart(2, "0")} / {String(total).padStart(2, "0")}
-          </p>
-          <p className="label text-signal">{section.kicker}</p>
-          <h3 className="display mt-1 text-[clamp(1.65rem,7.5vw,2.25rem)] leading-[0.95] text-paper">
-            {section.title}
-          </h3>
-
-          {isTop && (
-            <Link
-              to={getSectionPath(section.key)}
-              onClick={resetScrollPosition}
-              onPointerDown={(e) => e.stopPropagation()}
-              className="label mt-4 inline-flex items-center gap-2 border border-paper/35 bg-paper/10 px-4 py-2.5 text-paper backdrop-blur-sm transition-colors duration-200 active:border-signal active:bg-signal active:text-paper"
-            >
-              Смотреть работы
-              <span aria-hidden>↗</span>
-            </Link>
-          )}
-        </div>
-      </div>
+function FlyawayCard({
+  id,
+  section,
+  total,
+  vector,
+  onDone,
+}: {
+  id: number;
+  section: Section;
+  total: number;
+  vector: ExitVector;
+  onDone: (id: number) => void;
+}) {
+  return (
+    <motion.div
+      className="pointer-events-none absolute inset-x-0 top-0 z-50"
+      initial={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
+      animate={{
+        x: vector.x,
+        y: vector.y,
+        rotate: vector.rotate,
+        opacity: 0,
+      }}
+      transition={{ type: "spring", stiffness: 320, damping: 32 }}
+      onAnimationComplete={() => onDone(id)}
+    >
+      <CardFace section={section} total={total} />
     </motion.div>
   );
 }
@@ -198,32 +216,44 @@ function MobileDeck({ sections }: { sections: Section[] }) {
   const reduceMotion = useReducedMotion();
   const n = sections.length;
   const [deckIndex, setDeckIndex] = useState(0);
-  const [animating, setAnimating] = useState(false);
+  const [flyaway, setFlyaway] = useState<{
+    id: number;
+    section: Section;
+    vector: ExitVector;
+  } | null>(null);
 
-  const exitVectorRef = useRef<ExitVector>({ x: -420, y: 0, rotate: -12 });
-  const directionRef = useRef<DeckDirection>("forward");
-  const skipExitRef = useRef(false);
+  const lastSwipeRef = useRef(0);
+  const flyawayIdRef = useRef(0);
 
-  const goTo = useCallback(
-    (next: number, info: PanInfo | null, direction: DeckDirection) => {
-      if (animating || n === 0 || next === deckIndex) return;
+  const performSwipe = useCallback(
+    (direction: "forward" | "back", info: PanInfo) => {
+      if (n === 0) return;
 
-      directionRef.current = direction;
-      skipExitRef.current = direction === "jump";
+      const now = Date.now();
+      if (now - lastSwipeRef.current < SWIPE_COOLDOWN_MS) return;
+      lastSwipeRef.current = now;
 
-      if (direction === "jump") {
+      const current = sections[deckIndex];
+      if (!current) return;
+
+      const next =
+        direction === "back"
+          ? (deckIndex - 1 + n) % n
+          : (deckIndex + 1) % n;
+
+      if (reduceMotion) {
         setDeckIndex(next);
         return;
       }
 
-      exitVectorRef.current = deckExitVector(
-        direction === "back" ? "back" : "forward",
-        info ?? undefined
-      );
-      setAnimating(true);
+      setFlyaway({
+        id: ++flyawayIdRef.current,
+        section: current,
+        vector: deckExitVector(direction, info),
+      });
       setDeckIndex(next);
     },
-    [animating, deckIndex, n]
+    [deckIndex, n, reduceMotion, sections]
   );
 
   const handleDismiss = useCallback(
@@ -231,18 +261,24 @@ function MobileDeck({ sections }: { sections: Section[] }) {
       const { offset, velocity } = info;
       const swipedRight =
         offset.x > SWIPE_THRESHOLD || velocity.x > SWIPE_VELOCITY;
-      const next = swipedRight
-        ? (deckIndex - 1 + n) % n
-        : (deckIndex + 1) % n;
-      goTo(next, info, swipedRight ? "back" : "forward");
+      performSwipe(swipedRight ? "back" : "forward", info);
     },
-    [deckIndex, goTo, n]
+    [performSwipe]
   );
 
-  const handleExitComplete = useCallback(() => {
-    setAnimating(false);
-    skipExitRef.current = false;
+  const clearFlyaway = useCallback((id: number) => {
+    setFlyaway((prev) => (prev?.id === id ? null : prev));
   }, []);
+
+  const jumpTo = useCallback(
+    (index: number) => {
+      if (index === deckIndex || n === 0) return;
+      setFlyaway(null);
+      lastSwipeRef.current = 0;
+      setDeckIndex(index);
+    },
+    [deckIndex, n]
+  );
 
   const stack = getCircularStack(sections, deckIndex, STACK_DEPTH);
 
@@ -252,25 +288,27 @@ function MobileDeck({ sections }: { sections: Section[] }) {
         className="relative mx-auto h-[min(68vh,520px)] max-w-md"
         style={{ touchAction: "pan-y" }}
       >
-        <AnimatePresence mode="sync" initial={false} onExitComplete={handleExitComplete}>
-          {[...stack].reverse().map(({ section, offset }) => {
-            const depth = offset;
-            const isTop = depth === 0;
-            return (
-              <DeckCard
-                key={section.key}
-                section={section}
-                depth={depth}
-                isTop={isTop}
-                total={n}
-                exitVectorRef={exitVectorRef}
-                directionRef={directionRef}
-                skipExitRef={skipExitRef}
-                onDismiss={handleDismiss}
-              />
-            );
-          })}
-        </AnimatePresence>
+        {stack.map(({ section, offset }) => (
+          <DeckCard
+            key={section.key}
+            section={section}
+            depth={offset}
+            isTop={offset === 0}
+            total={n}
+            reduceMotion={!!reduceMotion}
+            onDismiss={handleDismiss}
+          />
+        ))}
+
+        {flyaway && (
+          <FlyawayCard
+            id={flyaway.id}
+            section={flyaway.section}
+            total={n}
+            vector={flyaway.vector}
+            onDone={clearFlyaway}
+          />
+        )}
       </div>
 
       <div className="mt-6 flex items-center justify-center gap-2">
@@ -280,9 +318,8 @@ function MobileDeck({ sections }: { sections: Section[] }) {
             type="button"
             aria-label={`${s.title}, карточка ${i + 1}`}
             aria-current={i === deckIndex ? "true" : undefined}
-            disabled={animating}
-            onClick={() => goTo(i, null, "jump")}
-            className={`h-2 rounded-full transition-all duration-300 ease-art disabled:opacity-40 ${
+            onClick={() => jumpTo(i)}
+            className={`h-2 rounded-full transition-all duration-300 ease-art ${
               i === deckIndex
                 ? "w-7 bg-signal"
                 : "w-2 bg-line active:bg-muted"
@@ -297,7 +334,7 @@ function MobileDeck({ sections }: { sections: Section[] }) {
             <button
               key={s.key}
               type="button"
-              onClick={() => goTo(i, null, "jump")}
+              onClick={() => jumpTo(i)}
               className={`label border px-3 py-1.5 transition-colors ${
                 i === deckIndex
                   ? "border-signal text-signal"
@@ -322,7 +359,7 @@ function MobileDeck({ sections }: { sections: Section[] }) {
             <Link
               to={getSectionPath(s.key)}
               onClick={resetScrollPosition}
-              onFocus={() => goTo(i, null, "jump")}
+              onFocus={() => jumpTo(i)}
               className={`flex w-full items-center justify-between gap-3 border-b border-line py-4 transition-colors active:bg-paper-dim ${
                 i === deckIndex ? "text-signal" : "text-ink"
               }`}
