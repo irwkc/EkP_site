@@ -12,7 +12,7 @@ const WORDS = [
 export default function Marquee() {
   const row = [...WORDS, ...WORDS];
   return (
-    <div className="overflow-hidden border-y border-line bg-ink py-4 text-paper md:py-5">
+    <div className="overflow-hidden border-y border-line bg-ink py-4 text-paper md:py-5" data-nav-theme="dark">
       <motion.div
         className="flex w-max gap-8 whitespace-nowrap md:gap-10"
         animate={{ x: ["0%", "-50%"] }}
@@ -32,7 +32,7 @@ export default function Marquee() {
 export function PhotoStrip({ images }: { images: string[] }) {
   const row = [...images, ...images];
   return (
-    <div id="photo-strip" className="relative overflow-hidden py-8 md:py-10">
+    <div id="photo-strip" data-nav-theme="light" className="relative overflow-hidden py-8 md:py-10">
       <div className="pointer-events-none absolute inset-0 bg-paper" aria-hidden />
       <motion.div
         className="relative z-20 flex w-max gap-4"

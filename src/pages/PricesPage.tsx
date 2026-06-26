@@ -22,7 +22,7 @@ export default function PricesPage() {
   return (
     <main className="relative bg-paper">
       <ChapterPaintPour chapterKey={PRICES_PATH} />
-      <section className="relative border-b border-line">
+      <section className="relative border-b border-line" data-nav-theme="light">
         <div className="relative md:min-h-0">
           <div className="relative z-[1] mx-auto max-w-[1600px] px-4 pb-12 pt-[calc(5.5rem+env(safe-area-inset-top))] md:px-10 md:pb-16 md:pt-32">
             <Link
@@ -96,6 +96,7 @@ export default function PricesPage() {
 
       <section
         id="section-cta"
+        data-nav-theme="dark"
         className="border-t border-line bg-ink px-4 pt-8 text-paper md:px-10 md:pt-16 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] md:pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))]"
       >
         <div className="mx-auto flex max-w-[1600px] flex-col gap-5 sm:flex-row sm:items-center sm:justify-between md:items-end">

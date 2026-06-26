@@ -80,6 +80,7 @@ export default function Founder() {
     <>
       <section
         id="founder"
+        data-nav-theme="light"
         ref={sectionRef}
         className="relative z-0 border-y border-line bg-paper-dim px-4 py-16 md:px-10 md:py-36"
       >

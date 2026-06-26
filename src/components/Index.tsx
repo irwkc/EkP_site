@@ -842,7 +842,7 @@ export default function Index() {
   const pointerUI = usePointerUI();
 
   return (
-    <section id="index" className="relative bg-paper px-4 py-14 md:px-10 md:py-36">
+    <section id="index" data-nav-theme="light" className="relative bg-paper px-4 py-14 md:px-10 md:py-36">
       <div className="mx-auto max-w-[1600px]">
         <div className="mb-8 flex flex-col gap-4 md:mb-14 md:flex-row md:items-end md:justify-between md:gap-6">
           <div>

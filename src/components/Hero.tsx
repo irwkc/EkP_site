@@ -41,6 +41,7 @@ export default function Hero() {
   return (
     <section
       ref={ref}
+      data-nav-theme="light"
       className="relative w-full overflow-x-clip"
     >
       <div className="mx-auto flex min-h-[100svh] w-full max-w-[1600px] flex-col justify-between px-4 pb-8 pt-[calc(5.25rem+env(safe-area-inset-top))] md:px-10 md:pb-10 md:pt-28 lg:pt-32">

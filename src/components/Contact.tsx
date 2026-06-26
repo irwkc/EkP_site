@@ -15,6 +15,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
+      data-nav-theme="dark"
       className="relative bg-ink px-4 pt-16 text-paper pb-[calc(2rem+env(safe-area-inset-bottom,0px))] md:px-10 md:pb-10 md:pt-32"
     >
       <div className="mx-auto max-w-[1600px]">

@@ -4,6 +4,7 @@ import { motion, useMotionValueEvent, useScroll, useSpring } from "motion/react"
 import { getLenis } from "../hooks/useLenis";
 import { STUDIO, isSectionKey } from "../data/sections";
 import { isCatalogPath } from "../data/catalog";
+import { resolveNavDark } from "../utils/navTheme";
 import MobileMenu from "./MobileMenu";
 
 const LINKS = [
@@ -61,21 +62,14 @@ export default function Nav() {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
-        const navH = 72;
-        const darkSectionIds = ["exhibition", "contact", "section-cta"];
-        setDark(
-          darkSectionIds.some((id) => {
-            const el = document.getElementById(id);
-            return !!el && el.getBoundingClientRect().top < navH;
-          })
-        );
+        setDark(resolveNavDark());
         ticking = false;
       });
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
     const locked = menuPhase !== "closed";

@@ -9,7 +9,7 @@ export default function Exhibition() {
   const [zoom, setZoom] = useState<string | null>(null);
 
   return (
-    <section id="exhibition" className="relative px-4 py-16 text-paper md:px-10 md:py-36">
+    <section id="exhibition" data-nav-theme="dark" className="relative px-4 py-16 text-paper md:px-10 md:py-36">
       <div className="pointer-events-none absolute inset-0 bg-ink" aria-hidden />
       <div className="relative mx-auto max-w-[1600px]">
         <div className="mb-10 flex flex-col gap-4 md:mb-14 md:flex-row md:items-end md:justify-between md:gap-6">

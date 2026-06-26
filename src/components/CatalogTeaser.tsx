@@ -19,6 +19,7 @@ export default function CatalogTeaser() {
   return (
     <section
       id="pricelist"
+      data-nav-theme="light"
       className="relative border-y border-line bg-paper-dim px-4 py-14 md:px-10 md:py-24"
     >
       <div className="mx-auto max-w-[1600px]">
