@@ -337,18 +337,18 @@ export default function MobileMenu({
   }, [phase, onClosed, onDrawComplete]);
 
   return (
-    <div className="fixed inset-0 z-[80] overscroll-none md:hidden" data-mobile-menu>
+    <div className="fixed inset-0 z-[80] overscroll-none lg:hidden" data-mobile-menu>
       <div className="absolute inset-0 bg-paper/40 backdrop-blur-[2px]" aria-hidden />
       <canvas ref={canvasRef} className="absolute inset-0" aria-hidden />
 
       <motion.div
-        className="relative mx-auto flex h-full w-full max-w-[min(52vw,13rem)] flex-col text-paper"
+        className="relative mx-auto flex h-full w-full max-w-[min(52vw,13rem)] flex-col text-paper md:max-w-[min(36vw,20rem)]"
         initial={false}
         animate={{ opacity: showItems ? 1 : 0 }}
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         style={{ pointerEvents: showItems ? "auto" : "none" }}
       >
-        <nav className="flex flex-1 flex-col items-center justify-center pb-6">
+        <nav className="flex flex-1 flex-col items-center justify-center pb-6 md:pb-10">
           <ul className="w-full space-y-0">
             {links.map((l, i) => (
               <motion.li
@@ -364,12 +364,12 @@ export default function MobileMenu({
                 <a
                   href={l.href}
                   onClick={onClose}
-                  className={`group block py-3 text-center active:opacity-80 ${
+                  className={`group block py-3 text-center active:opacity-80 md:py-4 ${
                     i < links.length - 1 ? "border-b border-paper/20" : ""
                   }`}
                 >
-                  <span className="label text-[0.5rem] text-paper/70">{l.n}</span>
-                  <span className="display mt-0.5 block text-[clamp(1.05rem,4.6vw,1.4rem)] leading-tight">
+                  <span className="label text-[0.5rem] text-paper/70 md:text-[0.58rem]">{l.n}</span>
+                  <span className="display mt-0.5 block text-[clamp(1.05rem,4.6vw,1.4rem)] leading-tight md:mt-1 md:text-[clamp(1.4rem,3.4vw,2.35rem)]">
                     {l.label}
                   </span>
                 </a>
@@ -396,16 +396,16 @@ export default function MobileMenu({
             transform: `translate(-50%, -50%) rotate(${tailCta.angle}deg)`,
             pointerEvents: showItems ? "auto" : "none",
           }}
-          className="absolute z-10 flex items-center gap-3 whitespace-nowrap px-1 text-paper active:opacity-80"
+          className="absolute z-10 flex items-center gap-3 whitespace-nowrap px-1 text-paper active:opacity-80 md:gap-4"
         >
           <span>
-            <span className="label block text-[0.5rem] text-paper/75">Записаться</span>
-            <span className="mt-0.5 block text-[clamp(0.8rem,3.6vw,0.95rem)] tracking-tight">
+            <span className="label block text-[0.5rem] text-paper/75 md:text-[0.58rem]">Записаться</span>
+            <span className="mt-0.5 block text-[clamp(0.8rem,3.6vw,0.95rem)] tracking-tight md:text-[clamp(0.95rem,2.4vw,1.3rem)]">
               {STUDIO.phone}
             </span>
           </span>
           <motion.span
-            className="cta-arrow-neon serif-italic mb-0.5 block shrink-0 text-xl"
+            className="cta-arrow-neon serif-italic mb-0.5 block shrink-0 text-xl md:text-2xl"
             initial={false}
             animate={
               showItems
@@ -438,7 +438,7 @@ export default function MobileMenu({
         initial={false}
         animate={{ opacity: showItems ? 1 : 0 }}
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="label pointer-events-none absolute inset-x-0 bottom-0 text-center text-[0.5rem] text-paper/55 safe-bottom"
+        className="label pointer-events-none absolute inset-x-0 bottom-0 text-center text-[0.5rem] text-paper/55 safe-bottom md:text-[0.58rem]"
         style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
       >
         {STUDIO.city} · {STUDIO.address}

@@ -786,22 +786,38 @@ function MobileDeck({ sections }: { sections: Section[] }) {
   );
 }
 
-function usePointerUI() {
-  const [pointerUI, setPointerUI] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(hover: hover) and (pointer: fine)").matches
+function isIPadLike() {
+  if (typeof navigator === "undefined") return false;
+  return (
+    /iPad/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
   );
+}
+
+function useDesktopIndexLayout() {
+  const [desktop, setDesktop] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const pointerUI = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const iPad = isIPadLike() && window.matchMedia("(min-width: 768px)").matches;
+    return pointerUI || iPad;
+  });
 
   useEffect(() => {
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const update = () => setPointerUI(mq.matches);
+    const fineMq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const widthMq = window.matchMedia("(min-width: 768px)");
+    const update = () => {
+      setDesktop(fineMq.matches || (isIPadLike() && widthMq.matches));
+    };
     update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
+    fineMq.addEventListener("change", update);
+    widthMq.addEventListener("change", update);
+    return () => {
+      fineMq.removeEventListener("change", update);
+      widthMq.removeEventListener("change", update);
+    };
   }, []);
 
-  return pointerUI;
+  return desktop;
 }
 
 function DesktopIndex({ sections }: { sections: Section[] }) {
@@ -839,7 +855,7 @@ function DesktopIndex({ sections }: { sections: Section[] }) {
 
 export default function Index() {
   const sections = useSections();
-  const pointerUI = usePointerUI();
+  const desktopLayout = useDesktopIndexLayout();
 
   return (
     <section id="index" data-nav-theme="light" className="relative bg-paper px-4 py-14 md:px-10 md:py-36">
@@ -859,7 +875,7 @@ export default function Index() {
           </p>
         </div>
 
-        {pointerUI ? (
+        {desktopLayout ? (
           <DesktopIndex sections={sections} />
         ) : (
           <MobileDeck sections={sections} />

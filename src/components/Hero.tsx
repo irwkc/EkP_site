@@ -47,14 +47,11 @@ export default function Hero() {
       <div className="mx-auto flex min-h-[100svh] w-full max-w-[1600px] flex-col justify-between px-4 pb-8 pt-[calc(5.25rem+env(safe-area-inset-top))] md:px-10 md:pb-10 md:pt-28 lg:pt-32">
         {/* top meta — compact on mobile */}
         <motion.div style={{ opacity: fade }} className="shrink-0">
-          <p className="label text-ink-soft md:hidden">
-            Авторская мастерская · Рязань
-          </p>
-          <div className="hidden w-full items-start justify-between md:flex">
-            <p className="label max-w-[16ch] text-ink-soft">
+          <div className="flex w-full items-start justify-between gap-3 sm:gap-4">
+            <p className="label max-w-[14ch] text-ink-soft sm:max-w-[18ch] md:max-w-[16ch]">
               Авторская мастерская Екатерины Сергиевской
             </p>
-            <p className="label text-right text-ink-soft">
+            <p className="label shrink-0 text-right text-ink-soft">
               Рязань · {STUDIO.address}
               <br />
               <span className="text-signal">№ 2012—26</span>

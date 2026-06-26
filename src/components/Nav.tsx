@@ -6,6 +6,7 @@ import { STUDIO, isSectionKey } from "../data/sections";
 import { isCatalogPath } from "../data/catalog";
 import { resolveNavDark } from "../utils/navTheme";
 import MobileMenu from "./MobileMenu";
+import Logo from "./Logo";
 
 const LINKS = [
   { href: "/#index", label: "Направления", n: "01" },
@@ -153,33 +154,21 @@ export default function Nav() {
         >
           <Link
             to="/"
-            className={`group min-w-0 flex flex-col leading-none ${
-              menuOpen ? "max-md:pointer-events-none max-md:opacity-0" : ""
+            aria-label="Сергиевская · Мастерская · Рязань"
+            className={`group shrink-0 transition-colors hover:text-signal-deep ${
+              menuOpen ? "max-lg:pointer-events-none max-lg:opacity-0" : ""
             }`}
             onClick={closeAndNavigate}
           >
-            <span className="display truncate text-xl tracking-tight transition-colors group-hover:text-signal-deep md:text-2xl">
-              Сергиевская
-            </span>
-            <span
-              className={`label mt-1 text-[0.55rem] transition-colors ${
-                menuOpen || dark
-                  ? "text-paper/50"
-                  : accent
-                    ? "text-signal/55"
-                    : "text-muted"
-              }`}
-            >
-              Мастерская · Рязань
-            </span>
+            <Logo className="h-9 w-auto sm:h-10 lg:h-11" />
           </Link>
 
-          <div className="hidden items-center gap-9 md:flex">
+          <div className="hidden min-w-0 items-center gap-5 lg:flex xl:gap-9">
             {LINKS.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
-                className="group flex items-center gap-1.5"
+                className="group flex shrink-0 items-center gap-1.5 whitespace-nowrap"
                 data-cursor
               >
                 <span
@@ -189,7 +178,7 @@ export default function Nav() {
                 >
                   {l.n}
                 </span>
-                <span className="sweep text-sm transition-colors group-hover:text-signal-deep">
+                <span className="sweep text-sm transition-colors group-hover:text-signal-deep xl:text-sm">
                   {l.label}
                 </span>
               </a>
@@ -200,7 +189,7 @@ export default function Nav() {
             <a
               href={STUDIO.phoneHref}
               data-cursor
-              className={`group relative hidden overflow-hidden border px-4 py-2 sm:block md:px-5 md:py-2.5 ${
+              className={`group relative hidden overflow-hidden border px-4 py-2 lg:block lg:px-5 lg:py-2.5 ${
                 dark ? "border-paper/40" : accent ? "border-signal" : "border-ink"
               }`}
             >
@@ -215,7 +204,7 @@ export default function Nav() {
               aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
               aria-expanded={menuOpen}
               onClick={toggleMenu}
-              className={`relative flex h-11 w-11 items-center justify-center rounded-full border transition-colors md:hidden ${
+              className={`relative flex h-11 w-11 items-center justify-center rounded-full border transition-colors lg:hidden ${
                 menuOpen
                   ? "border-signal bg-signal/12 text-signal"
                   : dark
@@ -251,7 +240,7 @@ export default function Nav() {
           }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           style={{ transformOrigin: "0% 50%" }}
-          className={`hidden h-px w-full md:block ${
+          className={`hidden h-px w-full lg:block ${
             dark ? "bg-paper" : accent ? "bg-signal" : "bg-ink"
           }`}
         />
