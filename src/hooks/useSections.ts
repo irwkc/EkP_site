@@ -10,11 +10,18 @@ export function useSections(): Section[] {
   const content = useSiteContent();
   return useMemo(
     () =>
-      SECTIONS_META.map((s) => ({
-        ...s,
-        images: content.gallery[s.key as SectionKey] ?? [],
-      })),
-    [content.gallery]
+      SECTIONS_META.map((s) => {
+        const images = content.gallery[s.key as SectionKey] ?? [];
+        const chosen = content.sectionPreviews?.[s.key as SectionKey];
+        const preview =
+          chosen && images.includes(chosen) ? chosen : images[0] ?? null;
+        return {
+          ...s,
+          images,
+          preview,
+        };
+      }),
+    [content.gallery, content.sectionPreviews]
   );
 }
 

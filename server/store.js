@@ -18,7 +18,11 @@ export function readContent() {
     writeContent(defaults);
     return defaults;
   }
-  return JSON.parse(fs.readFileSync(CONTENT_PATH, "utf8"));
+  const data = JSON.parse(fs.readFileSync(CONTENT_PATH, "utf8"));
+  if (!data.sectionPreviews || typeof data.sectionPreviews !== "object") {
+    data.sectionPreviews = {};
+  }
+  return data;
 }
 
 export function writeContent(data) {

@@ -13,6 +13,7 @@ export interface SiteContent {
   paintingsForSale: PaintingForSale[];
   exhibitionPicks: ExhibitionPick[];
   photoStrip: string[];
+  sectionPreviews: Partial<Record<SectionKey, string>>;
 }
 
 export type GallerySectionKey = SectionKey;

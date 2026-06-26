@@ -22,6 +22,8 @@ const HORIZONTAL_INTENT_RATIO = 0.38;
 const HORIZONTAL_DISMISS_RATIO = 0.28;
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 const DRAG_PEEK_THRESHOLD = 12;
+const SETTLE_SPRING = { type: "spring" as const, stiffness: 300, damping: 28, mass: 0.9 };
+const STACK_SLOT = { y: 14, scale: 0.958, rotate: -2.2, opacity: 0.91 };
 
 type SwipeGesture = {
   active: boolean;
@@ -87,8 +89,36 @@ function makePanInfo(g: SwipeGesture, endX: number, endY: number): PanInfo {
 type FlyawayOrigin = { x: number; rotateZ: number };
 type FlyawayEnd = { x: number; y: number; rotateZ: number; scale: number };
 
+type SettleFrom = { y: number; scale: number; rotate: number; opacity: number };
+
+function settleStartPose(direction: "forward" | "back", info: PanInfo): SettleFrom {
+  const peekProgress =
+    direction === "back"
+      ? Math.min(1, Math.max(0, -info.offset.x / 80))
+      : 0;
+
+  return {
+    y: STACK_SLOT.y * (1 - peekProgress),
+    scale: STACK_SLOT.scale + (1 - STACK_SLOT.scale) * peekProgress,
+    rotate: STACK_SLOT.rotate * (1 - peekProgress),
+    opacity: STACK_SLOT.opacity + (1 - STACK_SLOT.opacity) * peekProgress,
+  };
+}
+
+function stackPose(depth: number, backDrag: boolean, isTop: boolean): SettleFrom {
+  if (isTop) {
+    return { y: 0, scale: 1, rotate: 0, opacity: 1 };
+  }
+
+  return {
+    y: depth * 14,
+    scale: 1 - depth * 0.042,
+    rotate: depth * -2.2,
+    opacity: backDrag ? 0.1 : 1 - depth * 0.09,
+  };
+}
 function sectionPreview(section: Section) {
-  return section.images[0] ?? null;
+  return section.preview;
 }
 
 function getCircularStack(sections: Section[], startIndex: number, count: number) {
@@ -122,13 +152,11 @@ function flyawayEnd(direction: "forward" | "back", info: PanInfo): FlyawayEnd {
 function CardFace({
   section,
   total,
-  showHint,
-  showCta,
+  reduceMotion,
 }: {
   section: Section;
   total: number;
-  showHint?: boolean;
-  showCta?: boolean;
+  reduceMotion?: boolean;
 }) {
   const src = sectionPreview(section);
   const indexNum = Number.parseInt(section.index, 10);
@@ -155,7 +183,7 @@ function CardFace({
         aria-hidden
       />
 
-      {showHint && (
+      {!reduceMotion && (
         <div
           className="label pointer-events-none absolute inset-x-0 top-0 flex items-center justify-center gap-3 py-3 text-paper/45"
           aria-hidden
@@ -175,17 +203,15 @@ function CardFace({
           {section.title}
         </h3>
 
-        {showCta && (
-          <Link
-            to={getSectionPath(section.key)}
-            onClick={resetScrollPosition}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="label mt-4 inline-flex items-center gap-2 border border-paper/35 bg-paper/10 px-4 py-2.5 text-paper backdrop-blur-sm transition-colors duration-200 active:border-signal active:bg-signal active:text-paper"
-          >
-            Смотреть работы
-            <span aria-hidden>↗</span>
-          </Link>
-        )}
+        <Link
+          to={getSectionPath(section.key)}
+          onClick={resetScrollPosition}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="label mt-4 inline-flex items-center gap-2 border border-paper/35 bg-paper/10 px-4 py-2.5 text-paper backdrop-blur-sm transition-colors duration-200 active:border-signal active:bg-signal active:text-paper"
+        >
+          Смотреть работы
+          <span aria-hidden>↗</span>
+        </Link>
       </div>
     </div>
   );
@@ -198,8 +224,12 @@ function DeckCard({
   total,
   reduceMotion,
   dragOffset,
+  isSettling,
+  settleTick,
+  settleFrom,
   onDismiss,
   onDragChange,
+  onSettleComplete,
 }: {
   section: Section;
   depth: number;
@@ -207,8 +237,12 @@ function DeckCard({
   total: number;
   reduceMotion: boolean;
   dragOffset: number;
+  isSettling: boolean;
+  settleTick: number;
+  settleFrom?: SettleFrom;
   onDismiss: (info: PanInfo) => void;
   onDragChange: (x: number) => void;
+  onSettleComplete?: () => void;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const gestureRef = useRef<SwipeGesture>(emptyGesture());
@@ -218,6 +252,14 @@ function DeckCard({
   const dragY = useMotionValue(0);
   const rotateZ = useTransform(dragX, [-140, 140], [-11, 11]);
 
+  const backDrag = dragOffset < -DRAG_PEEK_THRESHOLD;
+  const pose = stackPose(depth, backDrag, isTop && !isSettling);
+
+  const poseY = useMotionValue(pose.y);
+  const poseScale = useMotionValue(pose.scale);
+  const poseRotate = useMotionValue(pose.rotate);
+  const poseOpacity = useMotionValue(pose.opacity);
+
   useEffect(() => {
     if (!isTop) {
       dragX.set(0);
@@ -226,6 +268,52 @@ function DeckCard({
       setLockScroll(false);
     }
   }, [isTop, dragX, dragY]);
+
+  useEffect(() => {
+    if (isSettling) return;
+    poseY.set(pose.y);
+    poseScale.set(pose.scale);
+    poseRotate.set(pose.rotate);
+    poseOpacity.set(pose.opacity);
+  }, [isSettling, pose.y, pose.scale, pose.rotate, pose.opacity, poseY, poseScale, poseRotate, poseOpacity]);
+
+  useEffect(() => {
+    if (!isTop || !isSettling || !settleFrom || reduceMotion) return;
+
+    let cancelled = false;
+
+    poseY.set(settleFrom.y);
+    poseScale.set(settleFrom.scale);
+    poseRotate.set(settleFrom.rotate);
+    poseOpacity.set(settleFrom.opacity);
+
+    const run = async () => {
+      await Promise.all([
+        animate(poseY, 0, SETTLE_SPRING),
+        animate(poseScale, 1, SETTLE_SPRING),
+        animate(poseRotate, 0, SETTLE_SPRING),
+        animate(poseOpacity, 1, SETTLE_SPRING),
+      ]);
+      if (!cancelled) onSettleComplete?.();
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    isTop,
+    isSettling,
+    settleTick,
+    settleFrom,
+    reduceMotion,
+    onSettleComplete,
+    poseY,
+    poseScale,
+    poseRotate,
+    poseOpacity,
+  ]);
 
   useEffect(() => {
     const el = cardRef.current;
@@ -337,31 +425,29 @@ function DeckCard({
     };
   }, [isTop, reduceMotion, onDismiss, onDragChange, dragX, dragY]);
 
-  const backDrag = dragOffset < -DRAG_PEEK_THRESHOLD;
-  const stackOpacity =
-    !isTop && backDrag ? 0.1 : 1 - depth * 0.09;
-
   return (
     <motion.div
       ref={cardRef}
       className="deck-card absolute inset-x-0 top-0"
-      transition={{ duration: 0 }}
       style={{
         zIndex: STACK_DEPTH - depth,
         touchAction: lockScroll ? "none" : isTop ? "pan-y" : "none",
         x: isTop ? dragX : 0,
-        y: isTop ? dragY : depth * 14,
-        rotateZ: isTop ? rotateZ : depth * -2.2,
-        scale: 1 - depth * 0.042,
-        opacity: stackOpacity,
+        y: isTop ? dragY : 0,
+        rotateZ: isTop && !isSettling ? rotateZ : 0,
       }}
     >
-      <CardFace
-        section={section}
-        total={total}
-        showHint={isTop && !reduceMotion}
-        showCta={isTop}
-      />
+      <motion.div
+        className="deck-card"
+        style={{
+          y: poseY,
+          scale: poseScale,
+          rotateZ: poseRotate,
+          opacity: poseOpacity,
+        }}
+      >
+        <CardFace section={section} total={total} reduceMotion={reduceMotion} />
+      </motion.div>
     </motion.div>
   );
 }
@@ -370,10 +456,12 @@ function BackPeekCard({
   section,
   total,
   dragOffset,
+  reduceMotion,
 }: {
   section: Section;
   total: number;
   dragOffset: number;
+  reduceMotion: boolean;
 }) {
   const progress = Math.min(1, Math.max(0, -dragOffset / 80));
   const y = 14 - progress * 14;
@@ -390,7 +478,7 @@ function BackPeekCard({
         transformOrigin: "50% 92%",
       }}
     >
-      <CardFace section={section} total={total} />
+      <CardFace section={section} total={total} reduceMotion={reduceMotion} />
     </div>
   );
 }
@@ -446,6 +534,11 @@ function MobileDeck({ sections }: { sections: Section[] }) {
   const n = sections.length;
   const [deckIndex, setDeckIndex] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
+  const [settling, setSettling] = useState<{
+    key: string;
+    tick: number;
+    from: SettleFrom;
+  } | null>(null);
   const [flyaway, setFlyaway] = useState<{
     id: number;
     section: Section;
@@ -485,6 +578,11 @@ function MobileDeck({ sections }: { sections: Section[] }) {
         end: flyawayEnd(direction, info),
         direction,
       });
+      setSettling({
+        key: sections[next]!.key,
+        tick: Date.now(),
+        from: settleStartPose(direction, info),
+      });
       setDragOffset(0);
       setDeckIndex(next);
     },
@@ -508,10 +606,15 @@ function MobileDeck({ sections }: { sections: Section[] }) {
     setFlyaway((prev) => (prev?.id === id ? null : prev));
   }, []);
 
+  const clearSettle = useCallback(() => {
+    setSettling(null);
+  }, []);
+
   const jumpTo = useCallback(
     (index: number) => {
       if (index === deckIndex || n === 0) return;
       setFlyaway(null);
+      setSettling(null);
       lastSwipeRef.current = 0;
       setDeckIndex(index);
     },
@@ -543,8 +646,14 @@ function MobileDeck({ sections }: { sections: Section[] }) {
             total={n}
             reduceMotion={!!reduceMotion}
             dragOffset={dragOffset}
+            isSettling={offset === 0 && settling?.key === section.key}
+            settleTick={settling?.tick ?? 0}
+            settleFrom={
+              offset === 0 && settling?.key === section.key ? settling.from : undefined
+            }
             onDismiss={handleDismiss}
             onDragChange={handleDragChange}
+            onSettleComplete={offset === 0 ? clearSettle : undefined}
           />
         ))}
 
@@ -553,6 +662,7 @@ function MobileDeck({ sections }: { sections: Section[] }) {
             section={backPeekSection}
             total={n}
             dragOffset={dragOffset}
+            reduceMotion={!!reduceMotion}
           />
         )}
 

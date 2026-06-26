@@ -14,9 +14,10 @@ export interface Section {
   blurb: string;
   meta: string;
   images: string[];
+  preview: string | null;
 }
 
-export const SECTIONS_META: Omit<Section, "images">[] = [
+export const SECTIONS_META: Omit<Section, "images" | "preview">[] = [
   {
     key: "zhivopis",
     index: "01",

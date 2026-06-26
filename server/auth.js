@@ -46,18 +46,30 @@ export function authMiddleware(req, res, next) {
   next();
 }
 
-export function setAuthCookie(res, token, maxAge) {
-  res.cookie(COOKIE, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge,
-    path: "/",
-  });
+export function isSecureRequest(req) {
+  if (process.env.COOKIE_SECURE === "true") return true;
+  if (process.env.COOKIE_SECURE === "false") return false;
+  return Boolean(
+    req?.secure || req?.headers?.["x-forwarded-proto"] === "https"
+  );
 }
 
-export function clearAuthCookie(res) {
-  res.clearCookie(COOKIE, { path: "/" });
+function cookieOptions(req, maxAge) {
+  return {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isSecureRequest(req),
+    ...(maxAge != null ? { maxAge } : {}),
+    path: "/",
+  };
+}
+
+export function setAuthCookie(res, token, maxAge, req) {
+  res.cookie(COOKIE, token, cookieOptions(req, maxAge));
+}
+
+export function clearAuthCookie(res, req) {
+  res.clearCookie(COOKIE, cookieOptions(req));
 }
 
 export { COOKIE };

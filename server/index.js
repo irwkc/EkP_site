@@ -125,12 +125,12 @@ app.post("/api/auth/login", async (req, res) => {
   }
   const { secret, maxAge } = getAuthConfig();
   const token = signToken({ sub: login }, secret);
-  setAuthCookie(res, token, maxAge);
+  setAuthCookie(res, token, maxAge, req);
   res.json({ ok: true });
 });
 
-app.post("/api/auth/logout", (_req, res) => {
-  clearAuthCookie(res);
+app.post("/api/auth/logout", (req, res) => {
+  clearAuthCookie(res, req);
   res.json({ ok: true });
 });
 
@@ -138,7 +138,7 @@ app.get("/api/auth/me", (req, res) => {
   const { secret } = getAuthConfig();
   const token = req.cookies?.[COOKIE];
   if (!token || !verifyToken(token, secret)) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.json({ ok: false });
   }
   res.json({ ok: true });
 });
@@ -232,8 +232,35 @@ app.delete("/api/gallery/:section", authMiddleware, (req, res) => {
   content.paintingsForSale = content.paintingsForSale.map((p) =>
     p.image === urlPath ? { ...p, image: "" } : p
   );
+  if (!content.sectionPreviews) content.sectionPreviews = {};
+  if (content.sectionPreviews[section] === urlPath) {
+    delete content.sectionPreviews[section];
+  }
   writeContent(content);
   res.json({ ok: true });
+});
+
+app.put("/api/section-previews/:section", authMiddleware, (req, res) => {
+  const { section } = req.params;
+  const { preview } = req.body ?? {};
+  if (!isSectionKey(section)) {
+    return res.status(400).json({ error: "Unknown section" });
+  }
+  const content = readContent();
+  if (!content.sectionPreviews) content.sectionPreviews = {};
+
+  if (preview === null || preview === "") {
+    delete content.sectionPreviews[section];
+  } else if (typeof preview !== "string") {
+    return res.status(400).json({ error: "preview must be a string or null" });
+  } else if (!content.gallery[section]?.includes(preview)) {
+    return res.status(400).json({ error: "Preview must be an image from this section gallery" });
+  } else {
+    content.sectionPreviews[section] = preview;
+  }
+
+  writeContent(content);
+  res.json({ ok: true, preview: content.sectionPreviews[section] ?? null });
 });
 
 app.put("/api/exhibition", authMiddleware, (req, res) => {

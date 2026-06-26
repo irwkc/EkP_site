@@ -11,7 +11,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error((err as { error?: string }).error || `Ошибка ${res.status}`);
+    const message = (err as { error?: string }).error || `Ошибка ${res.status}`;
+    if (res.status === 401) {
+      throw new Error("Сессия истекла — войдите снова");
+    }
+    throw new Error(message === "Unauthorized" ? "Нет доступа — войдите снова" : message);
   }
   return res.json() as Promise<T>;
 }
@@ -29,6 +33,11 @@ export const adminApi = {
     request("/gallery/" + section, {
       method: "PUT",
       body: JSON.stringify({ images }),
+    }),
+  saveSectionPreview: (section: string, preview: string | null) =>
+    request<{ ok: boolean; preview: string | null }>(`/section-previews/${section}`, {
+      method: "PUT",
+      body: JSON.stringify({ preview }),
     }),
   upload: (section: string, file: File) => {
     const fd = new FormData();
