@@ -12,8 +12,8 @@
   --color-gold: #b89255;
   --color-line: rgba(20, 16, 9, 0.16);
 
-  --font-display: "Playfair Display", Georgia, serif;
-  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: "Golos Text", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --ease-art: cubic-bezier(0.16, 1, 0.3, 1);
@@ -322,4 +322,16 @@ html.lenis body {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* directions deck — 3D card stack */
+.deck-stage {
+  perspective: 1100px;
+  perspective-origin: 50% 42%;
+}
+
+.deck-card-3d {
+  transform-origin: 50% 88%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
 }

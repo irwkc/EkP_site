@@ -1,6 +1,13 @@
 import { useCallback, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useReducedMotion, type PanInfo } from "motion/react";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+  type PanInfo,
+} from "motion/react";
 import { getSectionPath, type Section } from "../data/sections";
 import { useSections } from "../hooks/useSections";
 import { resetScrollPosition } from "../utils/scrollTo";
@@ -10,7 +17,13 @@ const SWIPE_THRESHOLD = 56;
 const SWIPE_VELOCITY = 420;
 const SWIPE_COOLDOWN_MS = 280;
 
-type ExitVector = { x: number; y: number; rotate: number };
+type FlyawayPose = {
+  x: number;
+  y: number;
+  rotateZ: number;
+  rotateY: number;
+  scale: number;
+};
 
 function sectionPreview(section: Section) {
   return section.images[0] ?? null;
@@ -26,19 +39,23 @@ function getCircularStack(sections: Section[], startIndex: number, count: number
   }));
 }
 
-function deckExitVector(direction: "forward" | "back", info?: PanInfo): ExitVector {
+function deckFlyaway(direction: "forward" | "back", info?: PanInfo): FlyawayPose {
   const offsetX = info?.offset.x ?? 0;
   if (direction === "back") {
     return {
-      x: Math.max(offsetX, 280) + 140,
-      y: (info?.offset.y ?? 0) * 0.15,
-      rotate: 12,
+      x: Math.max(offsetX, 200) + 300,
+      y: 56,
+      rotateZ: 14,
+      rotateY: 58,
+      scale: 0.84,
     };
   }
   return {
-    x: Math.min(offsetX, -280) - 140,
-    y: (info?.offset.y ?? 0) * 0.15,
-    rotate: -12,
+    x: Math.min(offsetX, -200) - 300,
+    y: 56,
+    rotateZ: -14,
+    rotateY: -58,
+    scale: 0.84,
   };
 }
 
@@ -129,6 +146,10 @@ function DeckCard({
   reduceMotion: boolean;
   onDismiss: (info: PanInfo) => void;
 }) {
+  const dragX = useMotionValue(0);
+  const rotateZ = useTransform(dragX, [-150, 150], [-15, 15]);
+  const rotateY = useTransform(dragX, [-150, 150], [-11, 11]);
+
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (!isTop) return;
     const { offset, velocity } = info;
@@ -139,34 +160,54 @@ function DeckCard({
 
     if (swipedLeft || swipedRight) {
       onDismiss(info);
+      return;
     }
+
+    animate(dragX, 0, { type: "spring", stiffness: 520, damping: 38 });
+  };
+
+  const stackPose = {
+    scale: 1 - depth * 0.048,
+    y: depth * 16,
+    opacity: 1 - depth * 0.11,
+    ...(isTop ? {} : { rotateZ: depth * -2.5 }),
   };
 
   return (
     <motion.div
-      className="absolute inset-x-0 top-0"
-      style={{ zIndex: STACK_DEPTH - depth, touchAction: isTop ? "pan-y" : "none" }}
-      initial={false}
-      animate={{
-        x: 0,
-        scale: 1 - depth * 0.045,
-        y: depth * 14,
-        rotate: depth * -2.5,
-        opacity: 1 - depth * 0.1,
+      className="deck-card-3d absolute inset-x-0 top-0"
+      style={{
+        zIndex: STACK_DEPTH - depth,
+        touchAction: isTop ? "pan-y" : "none",
+        transformStyle: "preserve-3d",
+        x: isTop ? dragX : 0,
+        rotateZ: isTop ? rotateZ : undefined,
+        rotateY: isTop ? rotateY : undefined,
       }}
-      transition={{ type: "spring", stiffness: 440, damping: 36 }}
+      initial={
+        isTop
+          ? { scale: 0.93, y: 28, opacity: 0.82, rotateY: -6 }
+          : false
+      }
+      animate={stackPose}
+      transition={{
+        type: "spring",
+        stiffness: isTop ? 380 : 460,
+        damping: isTop ? 30 : 36,
+        mass: isTop ? 0.92 : 0.78,
+      }}
       drag={isTop && !reduceMotion ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.55}
+      dragElastic={0.5}
       dragMomentum={false}
       dragDirectionLock
       onDragEnd={handleDragEnd}
       whileDrag={
         isTop
           ? {
-              scale: 1.015,
-              rotate: 0,
-              cursor: "grabbing",
+              scale: 1.02,
+              y: -4,
+              boxShadow: "0 32px 70px -18px rgba(20,16,9,0.45)",
             }
           : undefined
       }
@@ -185,29 +226,57 @@ function FlyawayCard({
   id,
   section,
   total,
-  vector,
+  pose,
+  direction,
   onDone,
 }: {
   id: number;
   section: Section;
   total: number;
-  vector: ExitVector;
+  pose: FlyawayPose;
+  direction: "forward" | "back";
   onDone: (id: number) => void;
 }) {
+  const smearSide = direction === "forward" ? "right" : "left";
+
   return (
     <motion.div
-      className="pointer-events-none absolute inset-x-0 top-0 z-50"
-      initial={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
+      className="deck-card-3d pointer-events-none absolute inset-x-0 top-0 z-50"
+      style={{ transformStyle: "preserve-3d" }}
+      initial={{ x: 0, y: 0, rotateZ: 0, rotateY: 0, scale: 1, opacity: 1 }}
       animate={{
-        x: vector.x,
-        y: vector.y,
-        rotate: vector.rotate,
+        x: pose.x,
+        y: pose.y,
+        rotateZ: pose.rotateZ,
+        rotateY: pose.rotateY,
+        scale: pose.scale,
         opacity: 0,
       }}
-      transition={{ type: "spring", stiffness: 320, damping: 32 }}
+      transition={{
+        type: "spring",
+        stiffness: 260,
+        damping: 28,
+        mass: 0.85,
+      }}
       onAnimationComplete={() => onDone(id)}
     >
-      <CardFace section={section} total={total} />
+      <div className="relative">
+        <CardFace section={section} total={total} />
+        <motion.div
+          className="pointer-events-none absolute inset-y-8 w-16"
+          style={{
+            [smearSide]: "-8px",
+            background:
+              smearSide === "right"
+                ? "linear-gradient(90deg, transparent, rgba(223,59,31,0.55), rgba(223,59,31,0.15))"
+                : "linear-gradient(270deg, transparent, rgba(223,59,31,0.55), rgba(223,59,31,0.15))",
+          }}
+          initial={{ opacity: 0, scaleX: 0.4 }}
+          animate={{ opacity: [0, 0.9, 0], scaleX: [0.4, 1.2, 0.6] }}
+          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          aria-hidden
+        />
+      </div>
     </motion.div>
   );
 }
@@ -219,7 +288,8 @@ function MobileDeck({ sections }: { sections: Section[] }) {
   const [flyaway, setFlyaway] = useState<{
     id: number;
     section: Section;
-    vector: ExitVector;
+    pose: FlyawayPose;
+    direction: "forward" | "back";
   } | null>(null);
 
   const lastSwipeRef = useRef(0);
@@ -249,7 +319,8 @@ function MobileDeck({ sections }: { sections: Section[] }) {
       setFlyaway({
         id: ++flyawayIdRef.current,
         section: current,
-        vector: deckExitVector(direction, info),
+        pose: deckFlyaway(direction, info),
+        direction,
       });
       setDeckIndex(next);
     },
@@ -285,12 +356,12 @@ function MobileDeck({ sections }: { sections: Section[] }) {
   return (
     <div className="md:hidden">
       <div
-        className="relative mx-auto h-[min(68vh,520px)] max-w-md"
+        className="deck-stage relative mx-auto h-[min(68vh,520px)] max-w-md"
         style={{ touchAction: "pan-y" }}
       >
         {stack.map(({ section, offset }) => (
           <DeckCard
-            key={section.key}
+            key={offset === 0 ? `top-${deckIndex}` : section.key}
             section={section}
             depth={offset}
             isTop={offset === 0}
@@ -305,7 +376,8 @@ function MobileDeck({ sections }: { sections: Section[] }) {
             id={flyaway.id}
             section={flyaway.section}
             total={n}
-            vector={flyaway.vector}
+            pose={flyaway.pose}
+            direction={flyaway.direction}
             onDone={clearFlyaway}
           />
         )}

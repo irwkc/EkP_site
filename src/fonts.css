@@ -1,0 +1,18 @@
+/* Self-hosted fonts — no Google Fonts CDN */
+
+/* Display: Playfair Display */
+@import "@fontsource/playfair-display/cyrillic-400.css";
+@import "@fontsource/playfair-display/cyrillic-500.css";
+@import "@fontsource/playfair-display/cyrillic-400-italic.css";
+@import "@fontsource/playfair-display/cyrillic-700.css";
+@import "@fontsource/playfair-display/cyrillic-700-italic.css";
+
+/* Body: Golos Text (кириллица, вместо Archivo) */
+@import "@fontsource/golos-text/cyrillic-400.css";
+@import "@fontsource/golos-text/cyrillic-500.css";
+@import "@fontsource/golos-text/cyrillic-600.css";
+@import "@fontsource/golos-text/cyrillic-700.css";
+
+/* Labels: JetBrains Mono */
+@import "@fontsource/jetbrains-mono/cyrillic-400.css";
+@import "@fontsource/jetbrains-mono/cyrillic-500.css";
