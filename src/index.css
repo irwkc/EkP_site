@@ -220,70 +220,9 @@ html.lenis body {
 
 .photo-strip-frame,
 .exhibition-photo,
-.catalog-photo,
-.index-preview-card {
+.catalog-photo {
   position: relative;
   z-index: 20;
-}
-
-.index-picker-stage {
-  position: relative;
-}
-
-.index-mobile-preview {
-  margin-bottom: 0.25rem;
-}
-
-.index-preview-col {
-  align-self: start;
-}
-
-.index-preview-pin {
-  position: sticky;
-  align-self: start;
-  z-index: 10;
-}
-
-@media (min-width: 768px) {
-  .index-picker-track {
-    min-height: calc(100svh - 7rem);
-  }
-}
-
-.index-picker-row {
-  transition: background-color 0.25s var(--ease-art);
-}
-
-@media (hover: hover) {
-  .index-picker-row:hover {
-    background-color: color-mix(in srgb, var(--color-paper-dim) 55%, transparent);
-  }
-}
-
-.index-picker-row:focus-visible {
-  background-color: color-mix(in srgb, var(--color-paper-dim) 70%, transparent);
-  outline: 1px solid color-mix(in srgb, var(--color-signal) 45%, transparent);
-  outline-offset: -1px;
-}
-
-.index-picker-row [data-picker-title],
-.index-picker-row [data-picker-index],
-.index-picker-row [data-picker-arrow] {
-  transition:
-    color 0.3s var(--ease-art),
-    opacity 0.3s var(--ease-art),
-    transform 0.3s var(--ease-art);
-}
-
-.index-progress-bar {
-  will-change: transform, opacity;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .index-picker-row [data-picker-title],
-  .index-picker-row [data-picker-arrow] {
-    transition: none !important;
-  }
 }
 
 #photo-strip {
