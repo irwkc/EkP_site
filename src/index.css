@@ -324,14 +324,22 @@ html.lenis body {
   }
 }
 
-/* directions deck — 3D card stack */
+/* directions deck */
 .deck-stage {
-  perspective: 1100px;
-  perspective-origin: 50% 42%;
+  perspective: 900px;
+  perspective-origin: 50% 46%;
 }
 
-.deck-card-3d {
-  transform-origin: 50% 88%;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
+.deck-card {
+  transform-origin: 50% 92%;
+  will-change: transform;
+}
+
+.deck-card-face {
+  box-shadow: 0 24px 60px -20px rgba(20, 16, 9, 0.35);
+}
+
+.deck-flyaway {
+  transform-origin: 50% 92%;
+  will-change: transform, opacity, filter;
 }
