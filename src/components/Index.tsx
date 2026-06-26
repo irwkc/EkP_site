@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   animate,
@@ -13,11 +13,76 @@ import { useSections } from "../hooks/useSections";
 import { resetScrollPosition } from "../utils/scrollTo";
 
 const STACK_DEPTH = 3;
-const SWIPE_THRESHOLD = 52;
-const SWIPE_VELOCITY = 380;
+const SWIPE_THRESHOLD = 48;
+const SWIPE_VELOCITY = 340;
 const SWIPE_COOLDOWN_MS = 240;
+const INTENT_SLOP = 8;
+/** Ниже = охотнее захватываем горизонтальный жест (диагональ тоже листает карточку) */
+const HORIZONTAL_INTENT_RATIO = 0.38;
+const HORIZONTAL_DISMISS_RATIO = 0.28;
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 const STACK_SPRING = { type: "spring" as const, stiffness: 290, damping: 34, mass: 0.95 };
+
+type SwipeGesture = {
+  active: boolean;
+  intent: "none" | "horizontal" | "vertical";
+  startX: number;
+  startY: number;
+  lastX: number;
+  lastY: number;
+  lastT: number;
+  vx: number;
+  vy: number;
+};
+
+function emptyGesture(): SwipeGesture {
+  return {
+    active: false,
+    intent: "none",
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+    lastT: 0,
+    vx: 0,
+    vy: 0,
+  };
+}
+
+function isHorizontalGesture(dx: number, dy: number, ratio: number) {
+  return Math.abs(dx) >= Math.abs(dy) * ratio;
+}
+
+function resolveSwipeDirection(
+  offsetX: number,
+  offsetY: number,
+  vx: number,
+  vy: number
+): "forward" | "back" | null {
+  const absX = Math.abs(offsetX);
+  const absY = Math.abs(offsetY);
+  const absVx = Math.abs(vx);
+  const absVy = Math.abs(vy);
+
+  const byOffset =
+    absX > SWIPE_THRESHOLD && isHorizontalGesture(offsetX, offsetY, HORIZONTAL_DISMISS_RATIO);
+  const byVelocity =
+    absVx > SWIPE_VELOCITY && isHorizontalGesture(vx, vy, HORIZONTAL_DISMISS_RATIO);
+
+  if (!byOffset && !byVelocity) return null;
+
+  const axis = byVelocity && absVx >= absX * 0.5 ? vx : offsetX;
+  return axis < 0 ? "forward" : "back";
+}
+
+function makePanInfo(g: SwipeGesture, endX: number, endY: number): PanInfo {
+  return {
+    offset: { x: endX - g.startX, y: endY - g.startY },
+    velocity: { x: g.vx, y: g.vy },
+    point: { x: endX, y: endY },
+    delta: { x: endX - g.lastX, y: endY - g.lastY },
+  };
+}
 
 type FlyawayOrigin = { x: number; rotateZ: number };
 type FlyawayEnd = { x: number; y: number; rotateZ: number; scale: number };
@@ -141,33 +206,140 @@ function DeckCard({
   reduceMotion: boolean;
   onDismiss: (info: PanInfo) => void;
 }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const gestureRef = useRef<SwipeGesture>(emptyGesture());
+  const [lockScroll, setLockScroll] = useState(false);
+
   const dragX = useMotionValue(0);
+  const dragY = useMotionValue(0);
   const rotateZ = useTransform(dragX, [-140, 140], [-11, 11]);
 
-  const handleDragEnd = (_: unknown, info: PanInfo) => {
-    if (!isTop) return;
-    const { offset, velocity } = info;
-    const swipedLeft =
-      offset.x < -SWIPE_THRESHOLD || velocity.x < -SWIPE_VELOCITY;
-    const swipedRight =
-      offset.x > SWIPE_THRESHOLD || velocity.x > SWIPE_VELOCITY;
-
-    if (swipedLeft || swipedRight) {
-      onDismiss(info);
-      return;
+  useEffect(() => {
+    if (!isTop) {
+      dragX.set(0);
+      dragY.set(0);
+      gestureRef.current = emptyGesture();
+      setLockScroll(false);
     }
+  }, [isTop, dragX, dragY]);
 
-    animate(dragX, 0, { type: "spring", stiffness: 420, damping: 36 });
-  };
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el || !isTop || reduceMotion) return;
+
+    const resetGesture = () => {
+      gestureRef.current = emptyGesture();
+      setLockScroll(false);
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0]!;
+      const now = performance.now();
+      gestureRef.current = {
+        active: true,
+        intent: "none",
+        startX: t.clientX,
+        startY: t.clientY,
+        lastX: t.clientX,
+        lastY: t.clientY,
+        lastT: now,
+        vx: 0,
+        vy: 0,
+      };
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const g = gestureRef.current;
+      if (!g.active || e.touches.length !== 1) return;
+
+      const t = e.touches[0]!;
+      const dx = t.clientX - g.startX;
+      const dy = t.clientY - g.startY;
+      const now = performance.now();
+      const dt = now - g.lastT;
+
+      if (dt > 0) {
+        g.vx = ((t.clientX - g.lastX) / dt) * 1000;
+        g.vy = ((t.clientY - g.lastY) / dt) * 1000;
+      }
+      g.lastX = t.clientX;
+      g.lastY = t.clientY;
+      g.lastT = now;
+
+      if (g.intent === "none") {
+        if (Math.hypot(dx, dy) < INTENT_SLOP) return;
+
+        if (isHorizontalGesture(dx, dy, HORIZONTAL_INTENT_RATIO)) {
+          g.intent = "horizontal";
+          setLockScroll(true);
+        } else if (isHorizontalGesture(dy, dx, HORIZONTAL_INTENT_RATIO)) {
+          g.intent = "vertical";
+          g.active = false;
+          return;
+        } else {
+          return;
+        }
+      }
+
+      if (g.intent === "horizontal") {
+        e.preventDefault();
+        dragX.set(dx);
+        dragY.set(dy * 0.14);
+      }
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      const g = gestureRef.current;
+      if (!g.active || g.intent !== "horizontal") {
+        resetGesture();
+        return;
+      }
+
+      const t = e.changedTouches[0]!;
+      const dx = t.clientX - g.startX;
+      const dy = t.clientY - g.startY;
+      const direction = resolveSwipeDirection(dx, dy, g.vx, g.vy);
+
+      if (direction) {
+        onDismiss(makePanInfo(g, t.clientX, t.clientY));
+      } else {
+        animate(dragX, 0, { type: "spring", stiffness: 420, damping: 36 });
+        animate(dragY, 0, { type: "spring", stiffness: 420, damping: 36 });
+      }
+
+      resetGesture();
+    };
+
+    const onTouchCancel = () => {
+      animate(dragX, 0, { type: "spring", stiffness: 420, damping: 36 });
+      animate(dragY, 0, { type: "spring", stiffness: 420, damping: 36 });
+      resetGesture();
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    el.addEventListener("touchcancel", onTouchCancel, { passive: true });
+
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchCancel);
+    };
+  }, [isTop, reduceMotion, onDismiss, dragX, dragY]);
 
   return (
     <motion.div
+      ref={cardRef}
       layout
       className="deck-card absolute inset-x-0 top-0"
       style={{
         zIndex: STACK_DEPTH - depth,
-        touchAction: isTop ? "pan-y" : "none",
+        touchAction: lockScroll ? "none" : isTop ? "pan-y" : "none",
         x: isTop ? dragX : 0,
+        y: isTop ? dragY : 0,
         rotateZ: isTop ? rotateZ : undefined,
       }}
       animate={{
@@ -180,20 +352,6 @@ function DeckCard({
         ...STACK_SPRING,
         layout: STACK_SPRING,
       }}
-      drag={isTop && !reduceMotion ? "x" : false}
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.42}
-      dragMomentum={false}
-      dragDirectionLock
-      onDragEnd={handleDragEnd}
-      whileDrag={
-        isTop
-          ? {
-              scale: 1.012,
-              y: -2,
-            }
-          : undefined
-      }
     >
       <CardFace
         section={section}
@@ -331,10 +489,13 @@ function MobileDeck({ sections }: { sections: Section[] }) {
 
   const handleDismiss = useCallback(
     (info: PanInfo) => {
-      const { offset, velocity } = info;
-      const swipedRight =
-        offset.x > SWIPE_THRESHOLD || velocity.x > SWIPE_VELOCITY;
-      performSwipe(swipedRight ? "back" : "forward", info);
+      const direction = resolveSwipeDirection(
+        info.offset.x,
+        info.offset.y,
+        info.velocity.x,
+        info.velocity.y
+      );
+      if (direction) performSwipe(direction, info);
     },
     [performSwipe]
   );
