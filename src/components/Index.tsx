@@ -10,26 +10,41 @@ import { getSectionPath, type Section } from "../data/sections";
 import { useSections } from "../hooks/useSections";
 import { resetScrollPosition } from "../utils/scrollTo";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
 const STACK_DEPTH = 3;
-const SWIPE_THRESHOLD = 72;
+const SWIPE_THRESHOLD = 56;
+const SWIPE_VELOCITY = 420;
+
+type ExitVector = { x: number; y: number; rotate: number };
+type DeckDirection = "forward" | "back" | "jump";
 
 function sectionPreview(section: Section) {
   return section.images[0] ?? null;
 }
 
-type ExitVector = { x: number; y: number; rotate: number };
+function getCircularStack(sections: Section[], startIndex: number, count: number) {
+  const n = sections.length;
+  if (n === 0) return [];
+  const size = Math.min(count, n);
+  return Array.from({ length: size }, (_, i) => ({
+    section: sections[(startIndex + i) % n]!,
+    offset: i,
+  }));
+}
 
-function deckExitVector(info: PanInfo): ExitVector {
-  const { offset } = info;
-  if (Math.abs(offset.x) >= Math.abs(offset.y)) {
+function deckExitVector(direction: "forward" | "back", info?: PanInfo): ExitVector {
+  const offsetX = info?.offset.x ?? 0;
+  if (direction === "back") {
     return {
-      x: offset.x >= 0 ? 420 : -420,
-      y: offset.y * 0.35,
-      rotate: offset.x >= 0 ? 14 : -14,
+      x: Math.max(offsetX, 280) + 140,
+      y: (info?.offset.y ?? 0) * 0.15,
+      rotate: 12,
     };
   }
-  return { x: offset.x * 0.35, y: -520, rotate: offset.x >= 0 ? 6 : -6 };
+  return {
+    x: Math.min(offsetX, -280) - 140,
+    y: (info?.offset.y ?? 0) * 0.15,
+    rotate: -12,
+  };
 }
 
 function DeckCard({
@@ -38,6 +53,8 @@ function DeckCard({
   isTop,
   total,
   exitVectorRef,
+  directionRef,
+  skipExitRef,
   onDismiss,
 }: {
   section: Section;
@@ -45,6 +62,8 @@ function DeckCard({
   isTop: boolean;
   total: number;
   exitVectorRef: RefObject<ExitVector>;
+  directionRef: RefObject<DeckDirection>;
+  skipExitRef: RefObject<boolean>;
   onDismiss: (info: PanInfo) => void;
 }) {
   const reduceMotion = useReducedMotion();
@@ -53,51 +72,64 @@ function DeckCard({
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (!isTop) return;
-    const { offset } = info;
-    if (
-      Math.abs(offset.x) > SWIPE_THRESHOLD ||
-      offset.y < -SWIPE_THRESHOLD
-    ) {
+    const { offset, velocity } = info;
+    const swipedLeft =
+      offset.x < -SWIPE_THRESHOLD || velocity.x < -SWIPE_VELOCITY;
+    const swipedRight =
+      offset.x > SWIPE_THRESHOLD || velocity.x > SWIPE_VELOCITY;
+
+    if (swipedLeft || swipedRight) {
       onDismiss(info);
     }
   };
 
+  const topInitial =
+    directionRef.current === "back"
+      ? { x: -72, opacity: 0.88, scale: 0.98 }
+      : { scale: 0.97, y: 12, opacity: 0.9 };
+
   const cardVariants = {
     inStack: {
+      x: 0,
       scale: 1 - depth * 0.045,
-      y: depth * 16,
-      rotate: depth * -2.8,
-      opacity: 1 - depth * 0.12,
+      y: depth * 14,
+      rotate: depth * -2.5,
+      opacity: 1 - depth * 0.1,
     },
     exit: () => {
-      const v = exitVectorRef.current ?? { x: 420, y: 0, rotate: 12 };
+      if (skipExitRef.current) {
+        return { opacity: 0, transition: { duration: 0.12 } };
+      }
+      const v = exitVectorRef.current ?? { x: -420, y: 0, rotate: -12 };
       return {
         x: v.x,
         y: v.y,
         rotate: v.rotate,
         opacity: 0,
-        transition: { type: "spring" as const, stiffness: 280, damping: 28 },
+        transition: { type: "spring" as const, stiffness: 320, damping: 32 },
       };
     },
   };
 
   return (
     <motion.div
-      className="absolute inset-x-0 top-0 touch-pan-y"
-      style={{ zIndex: STACK_DEPTH - depth }}
+      className="absolute inset-x-0 top-0"
+      style={{ zIndex: STACK_DEPTH - depth, touchAction: isTop ? "pan-y" : "none" }}
       variants={cardVariants}
-      initial={isTop ? { scale: 0.96, y: 18, opacity: 0.85 } : false}
+      initial={isTop ? topInitial : false}
       animate="inStack"
       exit="exit"
-      transition={{ type: "spring", stiffness: 420, damping: 34 }}
-      drag={isTop && !reduceMotion ? true : false}
-      dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
-      dragElastic={0.72}
+      transition={{ type: "spring", stiffness: 440, damping: 36 }}
+      drag={isTop && !reduceMotion ? "x" : false}
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.55}
+      dragMomentum={false}
+      dragDirectionLock
       onDragEnd={handleDragEnd}
       whileDrag={
         isTop
           ? {
-              scale: 1.02,
+              scale: 1.015,
               rotate: 0,
               cursor: "grabbing",
             }
@@ -125,10 +157,15 @@ function DeckCard({
           aria-hidden
         />
 
-        {isTop && (
-          <p className="label pointer-events-none absolute left-4 top-4 text-paper/55">
-            Свайп →
-          </p>
+        {isTop && !reduceMotion && (
+          <div
+            className="label pointer-events-none absolute inset-x-0 top-0 flex items-center justify-center gap-3 py-3 text-paper/45"
+            aria-hidden
+          >
+            <span>←</span>
+            <span>свайп</span>
+            <span>→</span>
+          </div>
         )}
 
         <div className="absolute inset-x-0 bottom-0 p-4">
@@ -144,6 +181,7 @@ function DeckCard({
             <Link
               to={getSectionPath(section.key)}
               onClick={resetScrollPosition}
+              onPointerDown={(e) => e.stopPropagation()}
               className="label mt-4 inline-flex items-center gap-2 border border-paper/35 bg-paper/10 px-4 py-2.5 text-paper backdrop-blur-sm transition-colors duration-200 active:border-signal active:bg-signal active:text-paper"
             >
               Смотреть работы
@@ -158,25 +196,65 @@ function DeckCard({
 
 function MobileDeck({ sections }: { sections: Section[] }) {
   const reduceMotion = useReducedMotion();
+  const n = sections.length;
   const [deckIndex, setDeckIndex] = useState(0);
-  const exitVectorRef = useRef<ExitVector>({ x: 420, y: 0, rotate: 12 });
+  const [animating, setAnimating] = useState(false);
 
-  const advance = useCallback(
-    (info: PanInfo) => {
-      exitVectorRef.current = deckExitVector(info);
-      setDeckIndex((i) => (i + 1) % sections.length);
+  const exitVectorRef = useRef<ExitVector>({ x: -420, y: 0, rotate: -12 });
+  const directionRef = useRef<DeckDirection>("forward");
+  const skipExitRef = useRef(false);
+
+  const goTo = useCallback(
+    (next: number, info: PanInfo | null, direction: DeckDirection) => {
+      if (animating || n === 0 || next === deckIndex) return;
+
+      directionRef.current = direction;
+      skipExitRef.current = direction === "jump";
+
+      if (direction === "jump") {
+        setDeckIndex(next);
+        return;
+      }
+
+      exitVectorRef.current = deckExitVector(
+        direction === "back" ? "back" : "forward",
+        info ?? undefined
+      );
+      setAnimating(true);
+      setDeckIndex(next);
     },
-    [sections.length]
+    [animating, deckIndex, n]
   );
 
-  const stackSections = sections.slice(deckIndex, deckIndex + STACK_DEPTH);
+  const handleDismiss = useCallback(
+    (info: PanInfo) => {
+      const { offset, velocity } = info;
+      const swipedRight =
+        offset.x > SWIPE_THRESHOLD || velocity.x > SWIPE_VELOCITY;
+      const next = swipedRight
+        ? (deckIndex - 1 + n) % n
+        : (deckIndex + 1) % n;
+      goTo(next, info, swipedRight ? "back" : "forward");
+    },
+    [deckIndex, goTo, n]
+  );
+
+  const handleExitComplete = useCallback(() => {
+    setAnimating(false);
+    skipExitRef.current = false;
+  }, []);
+
+  const stack = getCircularStack(sections, deckIndex, STACK_DEPTH);
 
   return (
     <div className="md:hidden">
-      <div className="relative mx-auto h-[min(68vh,520px)] max-w-md">
-        <AnimatePresence mode="popLayout" initial={false}>
-          {[...stackSections].reverse().map((section, reverseIdx) => {
-            const depth = reverseIdx;
+      <div
+        className="relative mx-auto h-[min(68vh,520px)] max-w-md"
+        style={{ touchAction: "pan-y" }}
+      >
+        <AnimatePresence mode="sync" initial={false} onExitComplete={handleExitComplete}>
+          {[...stack].reverse().map(({ section, offset }) => {
+            const depth = offset;
             const isTop = depth === 0;
             return (
               <DeckCard
@@ -184,9 +262,11 @@ function MobileDeck({ sections }: { sections: Section[] }) {
                 section={section}
                 depth={depth}
                 isTop={isTop}
-                total={sections.length}
+                total={n}
                 exitVectorRef={exitVectorRef}
-                onDismiss={advance}
+                directionRef={directionRef}
+                skipExitRef={skipExitRef}
+                onDismiss={handleDismiss}
               />
             );
           })}
@@ -200,8 +280,9 @@ function MobileDeck({ sections }: { sections: Section[] }) {
             type="button"
             aria-label={`${s.title}, карточка ${i + 1}`}
             aria-current={i === deckIndex ? "true" : undefined}
-            onClick={() => setDeckIndex(i)}
-            className={`h-2 rounded-full transition-all duration-300 ease-art ${
+            disabled={animating}
+            onClick={() => goTo(i, null, "jump")}
+            className={`h-2 rounded-full transition-all duration-300 ease-art disabled:opacity-40 ${
               i === deckIndex
                 ? "w-7 bg-signal"
                 : "w-2 bg-line active:bg-muted"
@@ -216,7 +297,7 @@ function MobileDeck({ sections }: { sections: Section[] }) {
             <button
               key={s.key}
               type="button"
-              onClick={() => setDeckIndex(i)}
+              onClick={() => goTo(i, null, "jump")}
               className={`label border px-3 py-1.5 transition-colors ${
                 i === deckIndex
                   ? "border-signal text-signal"
@@ -232,7 +313,7 @@ function MobileDeck({ sections }: { sections: Section[] }) {
       <p className="label mt-5 text-center text-muted">
         {reduceMotion
           ? "Выберите направление кнопкой или точками"
-          : "Смахните карточку — следующее направление · или откройте раздел"}
+          : "Свайп влево или вправо · вертикально — скролл страницы"}
       </p>
 
       <ul className="mt-8 border-t border-line">
@@ -241,7 +322,7 @@ function MobileDeck({ sections }: { sections: Section[] }) {
             <Link
               to={getSectionPath(s.key)}
               onClick={resetScrollPosition}
-              onFocus={() => setDeckIndex(i)}
+              onFocus={() => goTo(i, null, "jump")}
               className={`flex w-full items-center justify-between gap-3 border-b border-line py-4 transition-colors active:bg-paper-dim ${
                 i === deckIndex ? "text-signal" : "text-ink"
               }`}
