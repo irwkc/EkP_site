@@ -49,8 +49,8 @@ export const adminApi = {
   },
   replace: (section: string, imagePath: string, file: File) => {
     const fd = new FormData();
-    fd.append("file", file);
     fd.append("path", imagePath);
+    fd.append("file", file);
     return request<{ ok: boolean; url: string }>(`/gallery/${section}/replace`, {
       method: "POST",
       body: fd,

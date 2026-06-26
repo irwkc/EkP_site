@@ -3,6 +3,7 @@ import type { SiteContent } from "../data/contentTypes";
 import type { SectionKey } from "../data/sections";
 import { adminApi } from "./api";
 import { useAdminConfirm } from "./AdminConfirm";
+import { vkMediaUrl } from "../utils/mediaUrl";
 import {
   AdminUploadBar,
   defaultExhibitionPick,
@@ -33,11 +34,13 @@ function PreviewThumb({
   active,
   busy,
   onSelect,
+  assetVersions,
 }: {
   src: string;
   active: boolean;
   busy: boolean;
   onSelect: () => void;
+  assetVersions?: Record<string, number>;
 }) {
   return (
     <div className="admin-preview-stage group relative w-full">
@@ -53,7 +56,12 @@ function PreviewThumb({
             : "border-line"
         }`}
       >
-        <img src={src} alt="" className="h-full w-full object-cover" draggable={false} />
+        <img
+          src={vkMediaUrl(src, assetVersions)}
+          alt=""
+          className="h-full w-full object-cover"
+          draggable={false}
+        />
       </button>
     </div>
   );
@@ -65,6 +73,7 @@ function SectionPreviewPicker({
   selected,
   customPreview,
   busy,
+  assetVersions,
   onSelect,
   onReset,
 }: {
@@ -73,6 +82,7 @@ function SectionPreviewPicker({
   selected: string | null;
   customPreview: boolean;
   busy: boolean;
+  assetVersions?: Record<string, number>;
   onSelect: (src: string) => void;
   onReset: () => void;
 }) {
@@ -89,7 +99,11 @@ function SectionPreviewPicker({
           <p className="label mb-2 text-muted">Сейчас на сайте</p>
           <div className="aspect-[3/4] overflow-hidden border border-line bg-paper-dim">
             {selected ? (
-              <img src={selected} alt="" className="h-full w-full object-cover" />
+              <img
+                src={vkMediaUrl(selected, assetVersions)}
+                alt=""
+                className="h-full w-full object-cover"
+              />
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-muted">
                 Нет фото
@@ -120,6 +134,7 @@ function SectionPreviewPicker({
                   src={src}
                   active={src === selected}
                   busy={busy}
+                  assetVersions={assetVersions}
                   onSelect={() => onSelect(src)}
                 />
               ))}
@@ -309,6 +324,7 @@ export default function AdminPhotos() {
             selected={previewSelected}
             customPreview={customPreview}
             busy={busy}
+            assetVersions={content.assetVersions}
             onSelect={(src) => run(() => adminApi.saveSectionPreview(sectionKey, src))}
             onReset={() => run(() => adminApi.saveSectionPreview(sectionKey, null))}
           />
@@ -318,7 +334,11 @@ export default function AdminPhotos() {
             {images.map((src, i) => (
               <div key={src} className="group border border-line bg-paper-dim">
                 <div className="aspect-[4/5] overflow-hidden">
-                  <img src={src} alt="" className="h-full w-full object-cover" />
+                  <img
+                    src={vkMediaUrl(src, content.assetVersions)}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
                 </div>
                 <div className="flex flex-wrap gap-1 border-t border-line p-2">
                   <label className="label flex-1 cursor-pointer border border-line px-2 py-1.5 text-center text-[0.55rem] hover:border-signal hover:text-signal">

@@ -14,6 +14,7 @@ export interface SiteContent {
   exhibitionPicks: ExhibitionPick[];
   photoStrip: string[];
   sectionPreviews: Partial<Record<SectionKey, string>>;
+  assetVersions?: Record<string, number>;
 }
 
 export type GallerySectionKey = SectionKey;

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { STUDIO } from "../data/sections";
 import { scrollToId } from "../utils/scrollTo";
@@ -22,12 +22,21 @@ function Line({ children, delay = 0 }: { children: React.ReactNode; delay?: numb
 
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
+  const [animKey, setAnimKey] = useState(0);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
   });
   const txtY = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
   const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) setAnimKey((key) => key + 1);
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, []);
 
   return (
     <section
@@ -58,6 +67,7 @@ export default function Hero() {
           className="flex flex-1 flex-col justify-center py-4 md:py-6 lg:py-10"
         >
           <motion.h1
+            key={animKey}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.15 }}

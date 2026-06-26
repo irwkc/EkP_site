@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   animate,
@@ -8,8 +8,12 @@ import {
   useTransform,
   type PanInfo,
 } from "motion/react";
-import { getSectionPath, type Section } from "../data/sections";
+import { getSectionPath, type Section, type SectionKey } from "../data/sections";
 import { useSections } from "../hooks/useSections";
+import { useSiteContent } from "../context/ContentContext";
+import { resolveDeckIndex, saveDeckSection } from "../utils/deckIntent";
+import { vkMediaUrl } from "../utils/mediaUrl";
+import { setScrollIntent } from "../utils/scrollIntent";
 import { resetScrollPosition } from "../utils/scrollTo";
 
 const STACK_DEPTH = 3;
@@ -117,8 +121,51 @@ function stackPose(depth: number, backDrag: boolean, isTop: boolean): SettleFrom
     opacity: backDrag ? 0.1 : 1 - depth * 0.09,
   };
 }
-function sectionPreview(section: Section) {
-  return section.preview;
+function previewCandidates(section: Section) {
+  const list: string[] = [];
+  if (section.preview) list.push(section.preview);
+  for (const src of section.images) {
+    if (!list.includes(src)) list.push(src);
+  }
+  return list;
+}
+
+function DeckPreviewImage({ section, alt }: { section: Section; alt: string }) {
+  const { assetVersions } = useSiteContent();
+  const candidates = useMemo(() => previewCandidates(section), [section]);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    setIndex(0);
+  }, [candidates]);
+
+  const src = index < candidates.length ? candidates[index] : null;
+
+  if (!src) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-paper-dim">
+        <span className="label text-muted">Скоро</span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      key={src}
+      src={vkMediaUrl(src, assetVersions)}
+      alt={alt}
+      loading="eager"
+      decoding="async"
+      draggable={false}
+      onError={() => {
+        setIndex((current) => {
+          const next = current + 1;
+          return next <= candidates.length ? next : current;
+        });
+      }}
+      className="deck-preview-img pointer-events-none h-full w-full object-cover"
+    />
+  );
 }
 
 function getCircularStack(sections: Section[], startIndex: number, count: number) {
@@ -149,6 +196,11 @@ function flyawayEnd(direction: "forward" | "back", info: PanInfo): FlyawayEnd {
   return { x, y: 80, rotateZ: -12 - boost * 0.04, scale: 0.88 };
 }
 
+function goToSection(key: SectionKey) {
+  saveDeckSection(key);
+  setScrollIntent("index");
+}
+
 function CardFace({
   section,
   total,
@@ -158,25 +210,11 @@ function CardFace({
   total: number;
   reduceMotion?: boolean;
 }) {
-  const src = sectionPreview(section);
   const indexNum = Number.parseInt(section.index, 10);
 
   return (
     <div className="deck-card-face relative aspect-[3/4] w-full overflow-hidden border border-line bg-paper-dim">
-      {src ? (
-        <img
-          src={src}
-          alt={section.title}
-          loading="eager"
-          decoding="async"
-          draggable={false}
-          className="pointer-events-none h-full w-full object-cover"
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center bg-paper-dim">
-          <span className="label text-muted">Скоро</span>
-        </div>
-      )}
+      <DeckPreviewImage section={section} alt={section.title} />
 
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/88 via-ink/25 to-ink/10"
@@ -205,7 +243,7 @@ function CardFace({
 
         <Link
           to={getSectionPath(section.key)}
-          onClick={resetScrollPosition}
+          onClick={() => goToSection(section.key)}
           onPointerDown={(e) => e.stopPropagation()}
           className="label mt-4 inline-flex items-center gap-2 border border-paper/35 bg-paper/10 px-4 py-2.5 text-paper backdrop-blur-sm transition-colors duration-200 active:border-signal active:bg-signal active:text-paper"
         >
@@ -532,7 +570,7 @@ function FlyawayCard({
 function MobileDeck({ sections }: { sections: Section[] }) {
   const reduceMotion = useReducedMotion();
   const n = sections.length;
-  const [deckIndex, setDeckIndex] = useState(0);
+  const [deckIndex, setDeckIndex] = useState(() => resolveDeckIndex(sections));
   const [dragOffset, setDragOffset] = useState(0);
   const [settling, setSettling] = useState<{
     key: string;
@@ -549,6 +587,11 @@ function MobileDeck({ sections }: { sections: Section[] }) {
 
   const lastSwipeRef = useRef(0);
   const flyawayIdRef = useRef(0);
+
+  useEffect(() => {
+    const section = sections[deckIndex];
+    if (section) saveDeckSection(section.key);
+  }, [deckIndex, sections]);
 
   const performSwipe = useCallback(
     (direction: "forward" | "back", info: PanInfo) => {
@@ -725,7 +768,7 @@ function MobileDeck({ sections }: { sections: Section[] }) {
           <li key={s.key}>
             <Link
               to={getSectionPath(s.key)}
-              onClick={resetScrollPosition}
+              onClick={() => goToSection(s.key)}
               onFocus={() => jumpTo(i)}
               className={`flex w-full items-center justify-between gap-3 border-b border-line py-4 transition-colors active:bg-paper-dim ${
                 i === deckIndex ? "text-signal" : "text-ink"

@@ -5,10 +5,9 @@ import { clearScrollIntent, peekScrollIntent } from "../utils/scrollIntent";
 
 type LocationState = { scrollTo?: string } | null;
 
-function getScrollIntent(location: ReturnType<typeof useLocation>) {
-  return (
-    (location.state as LocationState)?.scrollTo ?? peekScrollIntent() ?? ""
-  );
+function getHomeScrollIntent(location: ReturnType<typeof useLocation>) {
+  if (location.pathname !== "/") return "";
+  return (location.state as LocationState)?.scrollTo ?? peekScrollIntent() ?? "";
 }
 
 export default function ScrollToTop() {
@@ -17,35 +16,55 @@ export default function ScrollToTop() {
   const skipScrollTop = useRef(false);
 
   useLayoutEffect(() => {
-    const scrollTo = getScrollIntent(location);
+    const isHome = location.pathname === "/";
+
+    if (!isHome) {
+      skipScrollTop.current = false;
+      resetScrollPosition();
+      return;
+    }
+
+    const scrollTo = getHomeScrollIntent(location);
     const id = location.hash.replace(/^#/, "");
-    if (!scrollTo && !id && !skipScrollTop.current) {
+
+    if (scrollTo) {
+      skipScrollTop.current = true;
+      jumpToId(scrollTo);
+      return;
+    }
+
+    if (id) {
+      skipScrollTop.current = true;
+      jumpToId(id);
+      return;
+    }
+
+    if (!skipScrollTop.current) {
       resetScrollPosition();
     }
   }, [location.pathname, location.hash, location.state]);
 
   useEffect(() => {
-    const scrollTo = getScrollIntent(location);
+    if (location.pathname !== "/") {
+      skipScrollTop.current = false;
+      return;
+    }
+
+    const scrollTo = getHomeScrollIntent(location);
 
     if (scrollTo) {
+      clearScrollIntent();
       skipScrollTop.current = true;
-
-      jumpToId(scrollTo, () => {
-        clearScrollIntent();
-        skipScrollTop.current = true;
+      if ((location.state as LocationState)?.scrollTo) {
         navigate(location.pathname, { replace: true, state: null });
-      });
+      }
       return;
     }
 
     const id = location.hash.replace(/^#/, "");
     if (id) {
       skipScrollTop.current = true;
-
-      jumpToId(id, () => {
-        skipScrollTop.current = true;
-        navigate({ pathname: location.pathname, hash: "" }, { replace: true });
-      });
+      navigate({ pathname: location.pathname, hash: "" }, { replace: true });
       return;
     }
 

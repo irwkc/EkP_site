@@ -16,58 +16,20 @@ import {
   COOKIE,
 } from "./auth.js";
 import { readContent, writeContent } from "./store.js";
+import {
+  isForbiddenPath,
+  nextUploadFilename,
+  SECTION_KEYS,
+  uploadDiskPath,
+  uploadSectionDir,
+  UPLOAD_ROOT,
+} from "./paths.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3001);
-const UPLOAD_ROOT =
-  process.env.UPLOAD_ROOT || path.join(__dirname, "..", "public", "vk");
-
-const SECTION_KEYS = [
-  "zhivopis",
-  "kurs",
-  "masterskaya",
-  "mebel",
-  "kartiny",
-  "masterclass",
-];
-
-const FORBIDDEN_PATHS = ["/founder.png", "founder.png"];
 
 function isSectionKey(key) {
   return SECTION_KEYS.includes(key);
-}
-
-function isForbiddenPath(urlPath) {
-  return FORBIDDEN_PATHS.some(
-    (p) => urlPath === p || urlPath.endsWith(p) || urlPath.includes("/founder.")
-  );
-}
-
-function urlToDisk(urlPath) {
-  if (!urlPath.startsWith("/vk/")) return null;
-  if (isForbiddenPath(urlPath)) return null;
-  const rel = urlPath.replace(/^\/vk\//, "");
-  const section = rel.split("/")[0];
-  if (!isSectionKey(section)) return null;
-  const disk = path.join(UPLOAD_ROOT, rel);
-  const resolved = path.resolve(disk);
-  const rootResolved = path.resolve(UPLOAD_ROOT);
-  if (!resolved.startsWith(rootResolved)) return null;
-  return resolved;
-}
-
-function nextFilename(section) {
-  const dir = path.join(UPLOAD_ROOT, section);
-  fs.mkdirSync(dir, { recursive: true });
-  let max = 0;
-  if (fs.existsSync(dir)) {
-    for (const f of fs.readdirSync(dir)) {
-      const m = /^(\d+)\.jpe?g$/i.exec(f);
-      if (m) max = Math.max(max, Number(m[1]));
-    }
-  }
-  const n = max + 1;
-  return `${String(n).padStart(2, "0")}.jpg`;
 }
 
 const upload = multer({
@@ -75,20 +37,18 @@ const upload = multer({
     destination(req, _file, cb) {
       const section = req.params.section;
       if (!isSectionKey(section)) return cb(new Error("Invalid section"));
-      const dir = path.join(UPLOAD_ROOT, section);
-      fs.mkdirSync(dir, { recursive: true });
-      cb(null, dir);
+      cb(null, uploadSectionDir(section));
     },
     filename(req, _file, cb) {
       const urlPath = req.body?.path;
       if (urlPath && typeof urlPath === "string") {
-        const disk = urlToDisk(urlPath);
+        const disk = uploadDiskPath(urlPath);
         if (disk) {
           cb(null, path.basename(disk));
           return;
         }
       }
-      cb(null, nextFilename(req.params.section));
+      cb(null, nextUploadFilename(req.params.section));
     },
   }),
   limits: { fileSize: 12 * 1024 * 1024 },
@@ -111,6 +71,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.get("/api/content", (_req, res) => {
+  res.set("Cache-Control", "no-store");
   res.json(readContent());
 });
 
@@ -208,6 +169,18 @@ app.post(
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
+
+    const target = uploadDiskPath(urlPath);
+    if (!target) {
+      return res.status(400).json({ error: "Invalid path" });
+    }
+
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    if (path.resolve(req.file.path) !== path.resolve(target)) {
+      fs.copyFileSync(req.file.path, target);
+      fs.unlinkSync(req.file.path);
+    }
+
     res.json({ ok: true, url: urlPath });
   }
 );
@@ -221,7 +194,7 @@ app.delete("/api/gallery/:section", authMiddleware, (req, res) => {
   if (!urlPath || isForbiddenPath(urlPath)) {
     return res.status(400).json({ error: "Invalid path" });
   }
-  const disk = urlToDisk(urlPath);
+  const disk = uploadDiskPath(urlPath);
   if (disk && fs.existsSync(disk)) {
     fs.unlinkSync(disk);
   }

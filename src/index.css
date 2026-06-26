@@ -357,6 +357,12 @@ html.lenis body {
   box-shadow: 0 24px 60px -20px rgba(20, 16, 9, 0.35);
 }
 
+.deck-preview-img {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 .deck-flyaway {
   transform-origin: 50% 92%;
   will-change: transform, opacity;

@@ -1,3 +1,4 @@
+import { useLocation } from "react-router-dom";
 import { useSiteContent } from "../context/ContentContext";
 import { PhotoStrip } from "../components/Marquee";
 import PaintTrail from "../components/PaintTrail";
@@ -10,12 +11,13 @@ import CatalogTeaser from "../components/CatalogTeaser";
 import Contact from "../components/Contact";
 
 export default function Home() {
+  const location = useLocation();
   const { photoStrip } = useSiteContent();
 
   return (
     <main id="top" className="relative overflow-x-clip overflow-y-clip">
       <PaintTrail />
-      <Hero />
+      <Hero key={location.key} />
       <Marquee />
       <Index />
       <PhotoStrip images={photoStrip} />
