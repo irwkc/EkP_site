@@ -5,6 +5,9 @@ import "./fonts.css";
 import "./index.css";
 import App from "./App";
 import { ContentProvider } from "./context/ContentContext";
+import { initManualScrollRestoration } from "./utils/scrollTo";
+
+initManualScrollRestoration();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

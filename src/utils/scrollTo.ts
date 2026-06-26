@@ -32,6 +32,25 @@ function siteEase(t: number): number {
 
 let activeRaf = 0;
 let detachUserListeners: (() => void) | null = null;
+let scrollRestorationInit = false;
+
+/** Disable browser scroll restoration — we handle scroll on route changes. */
+export function initManualScrollRestoration() {
+  if (scrollRestorationInit || typeof window === "undefined") return;
+  scrollRestorationInit = true;
+  if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+  }
+}
+
+function syncScrollY(y: number) {
+  const lenis = getLenis();
+  if (lenis) {
+    lenis.scrollTo(y, { immediate: true, force: true });
+    return;
+  }
+  window.scrollTo(0, y);
+}
 
 function cancelActiveScroll() {
   if (activeRaf) {
@@ -100,12 +119,7 @@ function animateScrollTo(targetY: number, durationMs: number) {
 /** Reset scroll to top — cancels RAF scroll and syncs Lenis if active. */
 export function resetScrollPosition() {
   cancelActiveScroll();
-  const lenis = getLenis();
-  if (lenis) {
-    lenis.scrollTo(0, { immediate: true, force: true });
-    return;
-  }
-  window.scrollTo(0, 0);
+  syncScrollY(0);
 }
 
 /**
@@ -130,7 +144,7 @@ export function jumpToId(id: string, onDone?: () => void) {
 
     const scroll = () => {
       const y = Math.max(0, el.getBoundingClientRect().top + window.scrollY);
-      window.scrollTo(0, y);
+      syncScrollY(y);
     };
 
     scroll();
@@ -147,6 +161,8 @@ export function jumpToId(id: string, onDone?: () => void) {
       apply(el);
       return;
     }
+    // Keep top while the home sections mount — avoids history-restore flash.
+    syncScrollY(0);
     if (attempts++ < 60) {
       raf = requestAnimationFrame(go);
     } else {
@@ -154,6 +170,8 @@ export function jumpToId(id: string, onDone?: () => void) {
     }
   };
 
+  cancelActiveScroll();
+  syncScrollY(0);
   go();
 }
 

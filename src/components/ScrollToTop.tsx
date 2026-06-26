@@ -1,6 +1,10 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { jumpToId, resetScrollPosition } from "../utils/scrollTo";
+import {
+  initManualScrollRestoration,
+  jumpToId,
+  resetScrollPosition,
+} from "../utils/scrollTo";
 import { clearScrollIntent, peekScrollIntent } from "../utils/scrollIntent";
 
 type LocationState = { scrollTo?: string } | null;
@@ -14,6 +18,20 @@ export default function ScrollToTop() {
   const location = useLocation();
   const navigate = useNavigate();
   const skipScrollTop = useRef(false);
+
+  useEffect(() => {
+    initManualScrollRestoration();
+
+    const onPopState = () => {
+      const { pathname, hash } = window.location;
+      if (pathname === "/" && !hash) {
+        resetScrollPosition();
+      }
+    };
+
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   useLayoutEffect(() => {
     const isHome = location.pathname === "/";
@@ -29,12 +47,14 @@ export default function ScrollToTop() {
 
     if (scrollTo) {
       skipScrollTop.current = true;
+      resetScrollPosition();
       jumpToId(scrollTo);
       return;
     }
 
     if (id) {
       skipScrollTop.current = true;
+      resetScrollPosition();
       jumpToId(id);
       return;
     }
