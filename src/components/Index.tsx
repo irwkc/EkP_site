@@ -14,7 +14,6 @@ import { useSiteContent } from "../context/ContentContext";
 import { resolveDeckIndex, saveDeckSection } from "../utils/deckIntent";
 import { vkMediaUrl } from "../utils/mediaUrl";
 import { setScrollIntent } from "../utils/scrollIntent";
-import { resetScrollPosition } from "../utils/scrollTo";
 
 const STACK_DEPTH = 3;
 const SWIPE_THRESHOLD = 48;
@@ -675,7 +674,7 @@ function MobileDeck({ sections }: { sections: Section[] }) {
   }, []);
 
   return (
-    <div className="md:hidden">
+    <div>
       <div
         className="deck-stage relative mx-auto h-[min(68vh,520px)] max-w-md overflow-visible"
         style={{ touchAction: "pan-y" }}
@@ -787,28 +786,48 @@ function MobileDeck({ sections }: { sections: Section[] }) {
   );
 }
 
+function usePointerUI() {
+  const [pointerUI, setPointerUI] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const update = () => setPointerUI(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  return pointerUI;
+}
+
 function DesktopIndex({ sections }: { sections: Section[] }) {
   return (
-    <ul className="hidden border-t border-line md:block">
+    <ul className="border-t border-line">
       {sections.map((s) => (
         <li key={s.key}>
           <Link
             to={getSectionPath(s.key)}
-            onClick={resetScrollPosition}
-            className="group flex w-full items-start justify-between gap-4 border-b border-line py-5 transition-colors active:bg-paper-dim md:items-center md:py-9"
+            onClick={() => goToSection(s.key)}
+            className="group grid grid-cols-[auto_1fr_auto] items-center gap-5 border-b border-line py-6 transition-colors hover:bg-paper-dim md:grid-cols-[auto_1fr_auto_auto] md:gap-8 md:py-9 lg:gap-12"
           >
-            <div className="min-w-0 flex-1">
-              <div className="flex items-baseline gap-3 md:gap-10">
-                <span className="label w-7 shrink-0 text-muted md:w-8">
-                  {s.index}
-                </span>
-                <span className="display text-[clamp(1.65rem,7.5vw,4.5rem)] leading-[0.95] transition-colors group-active:text-signal md:transition-all md:duration-500 md:ease-art md:group-hover:translate-x-3 md:group-hover:text-signal">
-                  {s.title}
-                </span>
-              </div>
-              <p className="label mt-2 pl-10 text-muted md:hidden">{s.kicker}</p>
+            <span className="label w-8 shrink-0 text-muted">{s.index}</span>
+
+            <div className="min-w-0">
+              <span className="display block text-[clamp(1.65rem,4.5vw,4.5rem)] leading-[0.95] transition-all duration-500 ease-art group-hover:translate-x-2 group-hover:text-signal">
+                {s.title}
+              </span>
+              <p className="label mt-4 text-muted md:mt-5">{s.kicker}</p>
             </div>
-            <span className="mt-2 shrink-0 text-xl text-signal md:mt-0 md:text-3xl">
+
+            <div className="index-desktop-preview hidden aspect-[3/4] w-28 shrink-0 overflow-hidden border border-line bg-paper-dim transition-colors duration-500 group-hover:border-signal md:block lg:w-36 xl:w-40">
+              <DeckPreviewImage section={s} alt={s.title} />
+            </div>
+
+            <span className="shrink-0 text-2xl text-signal transition-transform duration-500 ease-art group-hover:translate-x-1 md:text-3xl">
               ↗
             </span>
           </Link>
@@ -820,6 +839,7 @@ function DesktopIndex({ sections }: { sections: Section[] }) {
 
 export default function Index() {
   const sections = useSections();
+  const pointerUI = usePointerUI();
 
   return (
     <section id="index" className="relative bg-paper px-4 py-14 md:px-10 md:py-36">
@@ -839,8 +859,11 @@ export default function Index() {
           </p>
         </div>
 
-        <MobileDeck sections={sections} />
-        <DesktopIndex sections={sections} />
+        {pointerUI ? (
+          <DesktopIndex sections={sections} />
+        ) : (
+          <MobileDeck sections={sections} />
+        )}
       </div>
     </section>
   );
