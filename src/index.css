@@ -328,6 +328,7 @@ html.lenis body {
 .deck-stage {
   perspective: 900px;
   perspective-origin: 50% 46%;
+  overflow: visible;
 }
 
 .deck-card {
@@ -341,5 +342,6 @@ html.lenis body {
 
 .deck-flyaway {
   transform-origin: 50% 92%;
-  will-change: transform, opacity, filter;
+  will-change: transform, opacity;
+  isolation: isolate;
 }

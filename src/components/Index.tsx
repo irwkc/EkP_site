@@ -21,7 +21,7 @@ const INTENT_SLOP = 8;
 const HORIZONTAL_INTENT_RATIO = 0.38;
 const HORIZONTAL_DISMISS_RATIO = 0.28;
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
-const STACK_SPRING = { type: "spring" as const, stiffness: 290, damping: 34, mass: 0.95 };
+const DRAG_PEEK_THRESHOLD = 12;
 
 type SwipeGesture = {
   active: boolean;
@@ -72,7 +72,7 @@ function resolveSwipeDirection(
   if (!byOffset && !byVelocity) return null;
 
   const axis = byVelocity && absVx >= absX * 0.5 ? vx : offsetX;
-  return axis < 0 ? "forward" : "back";
+  return axis < 0 ? "back" : "forward";
 }
 
 function makePanInfo(g: SwipeGesture, endX: number, endY: number): PanInfo {
@@ -110,13 +110,13 @@ function flyawayEnd(direction: "forward" | "back", info: PanInfo): FlyawayEnd {
   const boost = Math.min(Math.abs(velocity.x) * 0.12, 100);
   const baseX = offset.x + velocity.x * 0.18;
 
-  if (direction === "back") {
-    const x = Math.max(baseX, 120) + 260 + boost;
-    return { x, y: 72, rotateZ: 11 + boost * 0.04, scale: 0.9 };
+  if (direction === "forward") {
+    const x = Math.max(baseX, 120) + 280 + boost;
+    return { x, y: 80, rotateZ: 12 + boost * 0.04, scale: 0.88 };
   }
 
-  const x = Math.min(baseX, -120) - 260 - boost;
-  return { x, y: 72, rotateZ: -11 - boost * 0.04, scale: 0.9 };
+  const x = Math.min(baseX, -120) - 280 - boost;
+  return { x, y: 80, rotateZ: -12 - boost * 0.04, scale: 0.88 };
 }
 
 function CardFace({
@@ -197,14 +197,18 @@ function DeckCard({
   isTop,
   total,
   reduceMotion,
+  dragOffset,
   onDismiss,
+  onDragChange,
 }: {
   section: Section;
   depth: number;
   isTop: boolean;
   total: number;
   reduceMotion: boolean;
+  dragOffset: number;
   onDismiss: (info: PanInfo) => void;
+  onDragChange: (x: number) => void;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const gestureRef = useRef<SwipeGesture>(emptyGesture());
@@ -286,6 +290,7 @@ function DeckCard({
         e.preventDefault();
         dragX.set(dx);
         dragY.set(dy * 0.14);
+        onDragChange(dx);
       }
     };
 
@@ -308,12 +313,14 @@ function DeckCard({
         animate(dragY, 0, { type: "spring", stiffness: 420, damping: 36 });
       }
 
+      onDragChange(0);
       resetGesture();
     };
 
     const onTouchCancel = () => {
       animate(dragX, 0, { type: "spring", stiffness: 420, damping: 36 });
       animate(dragY, 0, { type: "spring", stiffness: 420, damping: 36 });
+      onDragChange(0);
       resetGesture();
     };
 
@@ -328,29 +335,25 @@ function DeckCard({
       el.removeEventListener("touchend", onTouchEnd);
       el.removeEventListener("touchcancel", onTouchCancel);
     };
-  }, [isTop, reduceMotion, onDismiss, dragX, dragY]);
+  }, [isTop, reduceMotion, onDismiss, onDragChange, dragX, dragY]);
+
+  const backDrag = dragOffset < -DRAG_PEEK_THRESHOLD;
+  const stackOpacity =
+    !isTop && backDrag ? 0.1 : 1 - depth * 0.09;
 
   return (
     <motion.div
       ref={cardRef}
-      layout
       className="deck-card absolute inset-x-0 top-0"
+      transition={{ duration: 0 }}
       style={{
         zIndex: STACK_DEPTH - depth,
         touchAction: lockScroll ? "none" : isTop ? "pan-y" : "none",
         x: isTop ? dragX : 0,
-        y: isTop ? dragY : 0,
-        rotateZ: isTop ? rotateZ : undefined,
-      }}
-      animate={{
+        y: isTop ? dragY : depth * 14,
+        rotateZ: isTop ? rotateZ : depth * -2.2,
         scale: 1 - depth * 0.042,
-        y: depth * 14,
-        opacity: 1 - depth * 0.09,
-        rotateZ: isTop ? 0 : depth * -2.2,
-      }}
-      transition={{
-        ...STACK_SPRING,
-        layout: STACK_SPRING,
+        opacity: stackOpacity,
       }}
     >
       <CardFace
@@ -363,13 +366,41 @@ function DeckCard({
   );
 }
 
+function BackPeekCard({
+  section,
+  total,
+  dragOffset,
+}: {
+  section: Section;
+  total: number;
+  dragOffset: number;
+}) {
+  const progress = Math.min(1, Math.max(0, -dragOffset / 80));
+  const y = 14 - progress * 14;
+  const scale = 1 - 0.042 + progress * 0.042;
+  const rotate = -2.2 + progress * 2.2;
+
+  return (
+    <div
+      className="deck-card absolute inset-x-0 top-0"
+      style={{
+        zIndex: STACK_DEPTH - 1,
+        opacity: 0.91 + progress * 0.09,
+        transform: `translateY(${y}px) scale(${scale}) rotate(${rotate}deg)`,
+        transformOrigin: "50% 92%",
+      }}
+    >
+      <CardFace section={section} total={total} />
+    </div>
+  );
+}
+
 function FlyawayCard({
   id,
   section,
   total,
   origin,
   end,
-  direction,
   onDone,
 }: {
   id: number;
@@ -377,11 +408,8 @@ function FlyawayCard({
   total: number;
   origin: FlyawayOrigin;
   end: FlyawayEnd;
-  direction: "forward" | "back";
   onDone: (id: number) => void;
 }) {
-  const smearSide = direction === "forward" ? "right" : "left";
-
   return (
     <motion.div
       className="deck-flyaway pointer-events-none absolute inset-x-0 top-0 z-50"
@@ -391,50 +419,24 @@ function FlyawayCard({
         rotateZ: origin.rotateZ,
         scale: 1,
         opacity: 1,
-        filter: "blur(0px)",
       }}
       animate={{
-        x: [origin.x, origin.x + (end.x - origin.x) * 0.45, end.x],
-        y: [0, -28, end.y],
-        rotateZ: [origin.rotateZ, origin.rotateZ * 0.55, end.rotateZ],
-        scale: [1, 1.02, end.scale],
-        opacity: [1, 0.98, 0],
-        filter: ["blur(0px)", "blur(0px)", "blur(2px)"],
+        x: [origin.x, origin.x + (end.x - origin.x) * 0.42, end.x],
+        y: [0, -34, end.y],
+        rotateZ: [origin.rotateZ, origin.rotateZ * 0.5, end.rotateZ],
+        scale: [1, 1.03, end.scale],
+        opacity: [1, 1, 0],
       }}
       transition={{
-        duration: 0.78,
+        duration: 0.88,
         ease: EASE_OUT,
-        times: [0, 0.32, 1],
+        times: [0, 0.34, 1],
       }}
       onAnimationComplete={() => onDone(id)}
     >
-      <motion.div
-        className="deck-card-face relative shadow-[0_28px_80px_-16px_rgba(20,16,9,0.5)]"
-        animate={{
-          boxShadow: [
-            "0 28px 80px -16px rgba(20,16,9,0.45)",
-            "0 36px 90px -12px rgba(20,16,9,0.35)",
-            "0 8px 24px -8px rgba(20,16,9,0.1)",
-          ],
-        }}
-        transition={{ duration: 0.78, ease: EASE_OUT, times: [0, 0.35, 1] }}
-      >
+      <div className="deck-card-face relative">
         <CardFace section={section} total={total} />
-        <motion.div
-          className="pointer-events-none absolute inset-y-6 w-20"
-          style={{
-            [smearSide]: "-12px",
-            background:
-              smearSide === "right"
-                ? "linear-gradient(90deg, transparent 0%, rgba(223,59,31,0.12) 35%, rgba(223,59,31,0.65) 70%, rgba(223,59,31,0) 100%)"
-                : "linear-gradient(270deg, transparent 0%, rgba(223,59,31,0.12) 35%, rgba(223,59,31,0.65) 70%, rgba(223,59,31,0) 100%)",
-          }}
-          initial={{ opacity: 0, scaleX: 0.3 }}
-          animate={{ opacity: [0, 0.85, 0], scaleX: [0.3, 1.15, 0.7] }}
-          transition={{ duration: 0.55, ease: EASE_OUT, times: [0, 0.4, 1] }}
-          aria-hidden
-        />
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -443,6 +445,7 @@ function MobileDeck({ sections }: { sections: Section[] }) {
   const reduceMotion = useReducedMotion();
   const n = sections.length;
   const [deckIndex, setDeckIndex] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
   const [flyaway, setFlyaway] = useState<{
     id: number;
     section: Section;
@@ -482,6 +485,7 @@ function MobileDeck({ sections }: { sections: Section[] }) {
         end: flyawayEnd(direction, info),
         direction,
       });
+      setDragOffset(0);
       setDeckIndex(next);
     },
     [deckIndex, n, reduceMotion, sections]
@@ -515,11 +519,19 @@ function MobileDeck({ sections }: { sections: Section[] }) {
   );
 
   const stack = getCircularStack(sections, deckIndex, STACK_DEPTH);
+  const backPeekSection =
+    n > 0 ? sections[(deckIndex - 1 + n) % n]! : null;
+  const showBackPeek =
+    dragOffset < -DRAG_PEEK_THRESHOLD && backPeekSection !== null;
+
+  const handleDragChange = useCallback((x: number) => {
+    setDragOffset(x);
+  }, []);
 
   return (
     <div className="md:hidden">
       <div
-        className="deck-stage relative mx-auto h-[min(68vh,520px)] max-w-md"
+        className="deck-stage relative mx-auto h-[min(68vh,520px)] max-w-md overflow-visible"
         style={{ touchAction: "pan-y" }}
       >
         {stack.map(({ section, offset }) => (
@@ -530,9 +542,19 @@ function MobileDeck({ sections }: { sections: Section[] }) {
             isTop={offset === 0}
             total={n}
             reduceMotion={!!reduceMotion}
+            dragOffset={dragOffset}
             onDismiss={handleDismiss}
+            onDragChange={handleDragChange}
           />
         ))}
+
+        {showBackPeek && (
+          <BackPeekCard
+            section={backPeekSection}
+            total={n}
+            dragOffset={dragOffset}
+          />
+        )}
 
         {flyaway && (
           <FlyawayCard
@@ -541,7 +563,6 @@ function MobileDeck({ sections }: { sections: Section[] }) {
             total={n}
             origin={flyaway.origin}
             end={flyaway.end}
-            direction={flyaway.direction}
             onDone={clearFlyaway}
           />
         )}
