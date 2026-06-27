@@ -53,7 +53,7 @@ export const SECTIONS_META: Omit<Section, "images" | "preview">[] = [
     kicker: "Пространство на Соборной",
     blurb:
       "Свет, мольберты, запах краски и тишина, в которой рождаются работы. Сюда приходят творить — поодиночке и компаниями.",
-    meta: "ул. Радищева 45 · уютное арт-пространство",
+    meta: "ул. Радищева 45 · Уютное арт-пространство",
   },
   {
     key: "mebel",
@@ -63,6 +63,7 @@ export const SECTIONS_META: Omit<Section, "images" | "preview">[] = [
     blurb:
       "Старый комод с историей превращается в акцент интерьера. Реставрирую, перекрашиваю и расписываю мебель под ваш дом.",
     meta: "Под заказ · Авторская роспись · Разработка дизайна мебели",
+    contactNote: "conditions",
   },
   {
     key: "kartiny",
@@ -76,6 +77,7 @@ export const SECTIONS_META: Omit<Section, "images" | "preview">[] = [
       "холст, картон, бумага любого размера по эскизу и фотографии",
     ],
     meta: "Доставка в любой город",
+    contactNote: "conditions",
   },
   {
     key: "masterclass",
@@ -116,7 +118,7 @@ export const STUDIO = {
   name: "Художественная мастерская",
   owner: "Екатерина Сергиевская",
   city: "Рязань",
-  address: "ул. Радищева 45 · уютное арт-пространство",
+  address: "ул. Радищева 45 · Уютное арт-пространство",
   phone: "+7 (910) 901-10-83",
   phoneHref: "tel:+79109011083",
   vk: "https://vk.com/clubsketchatr",
