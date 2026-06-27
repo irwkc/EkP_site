@@ -52,7 +52,7 @@ export default function Hero() {
               Художественная мастерская Сергиевской Екатерины
             </p>
             <p className="label shrink-0 text-right text-ink-soft">
-              Рязань · {STUDIO.address}
+              Рязань · {STUDIO.address.split(" · ")[0]}
               <br />
               <span className="text-signal">№ 2012—26</span>
             </p>

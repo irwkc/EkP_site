@@ -101,7 +101,7 @@ export default function Founder() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: EASE }}
-              className="display whitespace-pre-line text-[clamp(1.05rem,3.2vw,1.65rem)] leading-snug md:text-[clamp(1.15rem,2.2vw,2rem)]"
+              className="display whitespace-pre-line text-[clamp(1.4rem,4.2vw,2.2rem)] leading-snug md:text-[clamp(1.55rem,3.2vw,2.6rem)]"
             >
               «{FOUNDER.lead}»
             </motion.h2>
