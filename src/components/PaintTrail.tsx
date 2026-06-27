@@ -55,7 +55,7 @@ export default function PaintTrail() {
     const dab = (x: number, y: number, dark: boolean) => {
       if (x < 0 || y < 0 || x > w || y > h) return;
       ctx.fillStyle = dark
-        ? "rgba(223, 59, 31, 0.09)"
+        ? "rgba(0, 191, 255, 0.09)"
         : "rgba(20, 16, 9, 0.05)";
       ctx.beginPath();
       ctx.ellipse(x, y, 5.5, 4.2, 0, 0, Math.PI * 2);

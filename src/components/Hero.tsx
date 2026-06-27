@@ -48,8 +48,8 @@ export default function Hero() {
         {/* top meta — compact on mobile */}
         <motion.div style={{ opacity: fade }} className="shrink-0">
           <div className="flex w-full items-start justify-between gap-3 sm:gap-4">
-            <p className="label max-w-[14ch] text-ink-soft sm:max-w-[18ch] md:max-w-[16ch]">
-              Авторская мастерская Екатерины Сергиевской
+            <p className="label max-w-[16ch] text-ink-soft sm:max-w-[22ch] md:max-w-[20ch]">
+              Художественная мастерская Сергиевской Екатерины
             </p>
             <p className="label shrink-0 text-right text-ink-soft">
               Рязань · {STUDIO.address}

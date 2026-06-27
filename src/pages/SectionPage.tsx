@@ -16,6 +16,48 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const DEFAULT_TITLE =
   "Сергиевская — Художественная мастерская в Рязани · живопись, реставрация, картины";
 
+function SectionContactNote({ note }: { note: "conditions" | "program" }) {
+  return (
+    <p className="mt-6 text-sm leading-relaxed text-muted md:mt-8 md:text-base">
+      {note === "program" ? (
+        <>
+          Подробности программы —{" "}
+          <a href={STUDIO.phoneHref} className="sweep text-ink-soft">
+            по телефону
+          </a>{" "}
+          или в{" "}
+          <a
+            href={STUDIO.vk}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sweep text-ink-soft"
+          >
+            группе VK
+          </a>
+          .
+        </>
+      ) : (
+        <>
+          Уточнить условия можно{" "}
+          <a href={STUDIO.phoneHref} className="sweep text-ink-soft">
+            по телефону
+          </a>{" "}
+          или через{" "}
+          <a
+            href={STUDIO.vk}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sweep text-ink-soft"
+          >
+            группу в VK
+          </a>
+          .
+        </>
+      )}
+    </p>
+  );
+}
+
 export default function SectionPage() {
   const { sectionKey } = useParams<{ sectionKey: string }>();
   const [zoom, setZoom] = useState<string | null>(null);
@@ -77,9 +119,26 @@ export default function SectionPage() {
             </div>
 
             <div className="mt-8 grid gap-8 md:mt-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
-              <p className="display text-[clamp(1.2rem,4vw,2rem)] leading-tight text-ink">
-                {section.blurb}
-              </p>
+              {section.features?.length ? (
+                <div>
+                  <ul className="space-y-3 text-[clamp(1.05rem,2.8vw,1.45rem)] leading-snug text-ink">
+                    {section.features.map((item) => (
+                      <li key={item} className="flex gap-3">
+                        <span className="mt-[0.55em] h-px w-4 shrink-0 bg-signal" aria-hidden />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {section.contactNote && <SectionContactNote note={section.contactNote} />}
+                </div>
+              ) : (
+                <div>
+                  <p className="display text-[clamp(1.2rem,4vw,2rem)] leading-tight text-ink">
+                    {section.blurb}
+                  </p>
+                  {section.contactNote && <SectionContactNote note={section.contactNote} />}
+                </div>
+              )}
               <div>
                 <p className="text-sm text-muted md:text-base">{section.meta}</p>
                 <a
