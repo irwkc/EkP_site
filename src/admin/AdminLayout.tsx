@@ -1,9 +1,10 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { adminPath } from "../utils/adminHost";
 
 const LINKS = [
-  { to: "/admin/photos", label: "Фото" },
-  { to: "/admin/prices", label: "Прайс" },
-  { to: "/admin/paintings", label: "Картины" },
+  { to: adminPath("photos"), label: "Фото" },
+  { to: adminPath("prices"), label: "Прайс" },
+  { to: adminPath("paintings"), label: "Картины" },
 ];
 
 interface Props {
@@ -21,7 +22,7 @@ export default function AdminLayout({ onLogout }: Props) {
           </div>
           <div className="flex items-center gap-3">
             <a
-              href="/"
+              href={import.meta.env.DEV ? "/" : "https://se-art.ru"}
               className="label hidden text-muted transition-colors hover:text-signal sm:inline"
             >
               На сайт →

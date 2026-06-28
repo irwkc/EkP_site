@@ -21,7 +21,7 @@ function drawPour(
   const time = progress * Math.PI * 2;
 
   // main pour body — wavy leading edge
-  ctx.fillStyle = `rgba(0, 191, 255, ${0.9 * fade})`;
+  ctx.fillStyle = `rgba(0, 0, 139, ${0.9 * fade})`;
   ctx.beginPath();
   ctx.moveTo(0, 0);
   ctx.lineTo(w, 0);
@@ -36,7 +36,7 @@ function drawPour(
   ctx.fill();
 
   // lighter wash ahead of the front
-  ctx.fillStyle = `rgba(0, 191, 255, ${0.22 * fade})`;
+  ctx.fillStyle = `rgba(0, 0, 139, ${0.22 * fade})`;
   ctx.beginPath();
   ctx.moveTo(0, 0);
   ctx.lineTo(w, 0);
@@ -65,7 +65,7 @@ function drawPour(
     ctx.ellipse(x, y0 + len * 0.45, bulge, len * 0.55, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = `rgba(0, 191, 255, ${0.7 * fade})`;
+    ctx.fillStyle = `rgba(0, 0, 139, ${0.7 * fade})`;
     ctx.beginPath();
     ctx.ellipse(x, y0 + len * 0.85, bulge * 0.55, bulge * 0.7, 0, 0, Math.PI * 2);
     ctx.fill();
