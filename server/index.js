@@ -66,6 +66,26 @@ app.set("trust proxy", 1);
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 
+const checkAdminSubdomain = (req, res, next) => {
+  const host = req.get('host');
+  // Для разработки на localhost пропускаем
+  if (host && (host.startsWith('irwkc.') || host === 'localhost' || host.startsWith('localhost:'))) {
+    next();
+  } else {
+    // Возвращаем 404, чтобы скрыть существование админки
+    res.status(404).json({ error: 'Not Found' });
+  }
+};
+
+// Применяем ко всем защищенным маршрутам
+app.use('/api/auth', checkAdminSubdomain);
+app.use('/api/gallery', checkAdminSubdomain);
+app.use('/api/section-previews', checkAdminSubdomain);
+app.use('/api/exhibition', checkAdminSubdomain);
+app.use('/api/photo-strip', checkAdminSubdomain);
+app.use('/api/prices', checkAdminSubdomain);
+app.use('/api/paintings', checkAdminSubdomain);
+
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
 });
