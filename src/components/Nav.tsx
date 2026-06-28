@@ -155,7 +155,7 @@ export default function Nav() {
           <Link
             to="/"
             aria-label="Сергиевская · Мастерская · Рязань"
-            className={`group shrink-0 transition-colors hover:text-signal-deep ${
+            className={`group shrink-0 transition-colors hover:text-signal ${
               menuOpen ? "max-lg:pointer-events-none max-lg:opacity-0" : ""
             }`}
             onClick={closeAndNavigate}
@@ -174,11 +174,11 @@ export default function Nav() {
                 <span
                   className={`label text-[0.58rem] transition-colors ${
                     dark ? "text-paper/40" : accent ? "text-signal/50" : "text-muted"
-                  } group-hover:text-signal-deep`}
+                  } group-hover:text-signal`}
                 >
                   {l.n}
                 </span>
-                <span className="sweep text-sm transition-colors group-hover:text-signal-deep xl:text-sm">
+                <span className="sweep text-sm transition-colors group-hover:text-signal xl:text-sm">
                   {l.label}
                 </span>
               </a>

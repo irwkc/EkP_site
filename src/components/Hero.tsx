@@ -1,42 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
+import Logo from "./Logo";
 import { STUDIO } from "../data/sections";
 import { scrollToId } from "../utils/scrollTo";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-function Line({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  return (
-    <span className="hero-line-mask block">
-      <motion.span
-        className="inline-block"
-        initial={{ y: "115%" }}
-        animate={{ y: "0%" }}
-        transition={{ duration: 1, ease: EASE, delay }}
-      >
-        {children}
-      </motion.span>
-    </span>
-  );
-}
-
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
-  const [animKey, setAnimKey] = useState(0);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
   });
-  const txtY = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
   const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
-
-  useEffect(() => {
-    const onPageShow = (event: PageTransitionEvent) => {
-      if (event.persisted) setAnimKey((key) => key + 1);
-    };
-    window.addEventListener("pageshow", onPageShow);
-    return () => window.removeEventListener("pageshow", onPageShow);
-  }, []);
 
   return (
     <section
@@ -45,63 +22,45 @@ export default function Hero() {
       className="relative w-full overflow-x-clip"
     >
       <div className="mx-auto flex min-h-[100svh] w-full max-w-[1600px] flex-col justify-between px-4 pb-8 pt-[calc(5.25rem+env(safe-area-inset-top))] md:px-10 md:pb-10 md:pt-28 lg:pt-32">
-        {/* top meta — compact on mobile */}
+        {/* top meta — street address stretched across the top edge */}
         <motion.div style={{ opacity: fade }} className="shrink-0">
-          <div className="flex w-full items-start justify-between gap-3 sm:gap-4">
-            <p className="label max-w-[16ch] text-ink-soft sm:max-w-[22ch] md:max-w-[20ch]">
-              Художественная мастерская Сергиевской Екатерины
+          <div className="flex w-full flex-wrap items-start justify-between gap-x-3 gap-y-1 sm:gap-x-4">
+            <p className="label whitespace-nowrap text-ink-soft">{STUDIO.city}</p>
+            <p className="label whitespace-nowrap text-ink-soft">
+              {STUDIO.address.split(" · ")[0]}
             </p>
-            <p className="label shrink-0 text-right text-ink-soft">
-              Рязань · {STUDIO.address.split(" · ")[0]}
-              <br />
-              <span className="text-signal">№ 2012—26</span>
-            </p>
+            <p className="label whitespace-nowrap text-signal">№ 2012—26</p>
           </div>
         </motion.div>
 
-        {/* headline — focal point on mobile */}
+        {/* focal — large logo above studio name */}
         <motion.div
-          style={{ y: txtY }}
-          className="flex flex-1 flex-col justify-center py-4 md:py-6 lg:py-10"
+          style={{ y }}
+          className="flex flex-1 flex-col items-center justify-center gap-6 py-4 md:gap-10 md:py-6 lg:gap-14 lg:py-10"
         >
-          <motion.h1
-            key={animKey}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-            className="display relative z-10 text-ink"
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: EASE, delay: 0.15 }}
           >
-            <span className="hero-title-line block">
-              <Line delay={0.2}>Интерьер,</Line>
-            </span>
-            <span className="hero-title-line block pl-3 sm:pl-[6vw]">
-              <Line delay={0.3}>
-                <span className="serif-italic text-signal">как искусство</span>
-              </Line>
-            </span>
-            <span className="hero-title-line block">
-              <Line delay={0.4}>
-                <span className="outline">и&nbsp;ты</span>
-              </Line>
-            </span>
+            <Logo className="w-60 text-ink md:w-72 lg:w-[26rem]" />
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: EASE, delay: 0.35 }}
+            className="display max-w-5xl text-center text-ink [text-wrap:balance]"
+          >
+            Художественная мастерская Екатерины Сергиевской
           </motion.h1>
         </motion.div>
 
         {/* bottom */}
         <motion.div
           style={{ opacity: fade }}
-          className="flex shrink-0 flex-col gap-6 md:flex-row md:items-end md:justify-between"
+          className="flex shrink-0 flex-col md:flex-row md:items-end md:justify-end"
         >
-          <motion.p
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.85, duration: 0.9 }}
-            className="max-w-md text-base leading-relaxed text-ink-soft md:text-lg"
-          >
-            Живопись с нуля, реставрация мебели и авторские картины — в
-            пространстве, где красоте учат каждого.
-          </motion.p>
-
           <motion.a
             href="#index"
             onClick={(e) => {
