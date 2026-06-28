@@ -28,12 +28,10 @@ rsync -avz \
 echo "→ Restart API"
 ssh "${SSH_OPTS[@]}" "$HOST" "sudo systemctl restart sergievskaya-api"
 
-if [[ -f "$ROOT/server/nginx-sergievskaya.conf" ]]; then
-  echo "→ Nginx config"
-  rsync -avz \
-    -e "ssh ${SSH_OPTS[*]}" \
-    "$ROOT/server/nginx-sergievskaya.conf" "$HOST:/tmp/nginx-sergievskaya.conf"
-  ssh "${SSH_OPTS[@]}" "$HOST" "sudo cp /tmp/nginx-sergievskaya.conf /etc/nginx/sites-available/sergievskaya && sudo nginx -t && sudo systemctl reload nginx"
-fi
+# Nginx config is intentionally NOT pushed here.
+# After scripts/setup-ssl.sh runs certbot --nginx, the live config on the server
+# includes HTTPS server blocks and HTTP→HTTPS redirects. Overwriting it with the
+# HTTP-only version in server/nginx-sergievskaya.conf would silently break SSL.
+# To re-issue or update certificates, run: CERTBOT_EMAIL=... bash scripts/setup-ssl.sh
 
 echo "Done."

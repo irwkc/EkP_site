@@ -10,3 +10,6 @@ server/.env
 server/data/
 server/node_modules/
 public/
+scripts/setup-ssl.sh
+src/utils/adminHost.ts
+src/vite-env.d.ts
