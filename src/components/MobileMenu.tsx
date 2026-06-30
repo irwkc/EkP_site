@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { STUDIO } from "../data/sections";
 
 const DRAW_MS = 680;
-const BRUSH_COLOR = "#00008B";
+const BRUSH_COLOR = "#df3b1f";
 
 type Point = { x: number; y: number };
 

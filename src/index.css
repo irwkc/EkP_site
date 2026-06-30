@@ -7,8 +7,8 @@
   --color-ink: #141009;
   --color-ink-soft: #5f574a;
   --color-muted: #908676;
-  --color-signal: #00008B;
-  --color-gold: #b89255;
+  --color-signal: #df3b1f;
+  --color-signal-deep: #b62f17;
   --color-line: rgba(20, 16, 9, 0.16);
 
   --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
@@ -240,7 +240,7 @@ html.lenis body {
   background: var(--color-signal);
   pointer-events: none;
   transform: translate(-50%, -50%);
-  box-shadow: 0 2px 8px rgba(0, 0, 139, 0.35);
+  box-shadow: 0 2px 8px rgba(223, 59, 31, 0.35);
   transition: width 0.28s var(--ease-art), height 0.28s var(--ease-art),
     background 0.3s, opacity 0.3s, box-shadow 0.3s;
 }
@@ -251,7 +251,7 @@ html.lenis body {
   height: 30px;
   background: transparent;
   border: 1.5px solid var(--color-signal);
-  box-shadow: 0 0 0 3px rgba(0, 0, 139, 0.1);
+  box-shadow: 0 0 0 3px rgba(223, 59, 31, 0.1);
 }
 
 @media (hover: hover) and (pointer: fine) {

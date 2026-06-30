@@ -118,7 +118,7 @@ export const STUDIO = {
   name: "Художественная мастерская",
   owner: "Екатерина Сергиевская",
   city: "Рязань",
-  address: "ул. Радищева 45 · Уютное арт-пространство",
+  address: "ул. Радищева 45",
   phone: "+7 (910) 901-10-83",
   phoneHref: "tel:+79109011083",
   vk: "https://vk.com/clubsketchatr",

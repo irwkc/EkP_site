@@ -43,7 +43,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: EASE, delay: 0.15 }}
           >
-            <Logo className="w-60 text-ink md:w-72 lg:w-[26rem]" />
+            <Logo className="w-75 text-ink md:w-87 lg:w-[26rem]" />
           </motion.div>
 
           <motion.h1
@@ -52,7 +52,8 @@ export default function Hero() {
             transition={{ duration: 0.9, ease: EASE, delay: 0.35 }}
             className="display max-w-5xl text-center text-ink [text-wrap:balance]"
           >
-            Художественная мастерская Екатерины Сергиевской
+            <p className="label text-ink">Художественная мастерская</p>
+            <span className="label text-signal">Екатерины Сергиевской</span>
           </motion.h1>
         </motion.div>
 
