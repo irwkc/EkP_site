@@ -65,7 +65,6 @@ export default function Founder() {
       <div className="relative z-10 overflow-hidden border-[6px] border-paper shadow-2xl">
         <motion.img
           src={FOUNDER.photo}
-          alt={FOUNDER.name}
           style={{ y: imgY }}
           className="aspect-[4/5] w-full scale-110 object-cover"
         />
@@ -103,11 +102,11 @@ export default function Founder() {
               transition={{ duration: 0.8, ease: EASE }}
               className="display text-[clamp(1.4rem,4.2vw,2.2rem)] leading-snug md:text-[clamp(1.55rem,3.2vw,2.6rem)]"
             >
-              «{FOUNDER.lead}»
-            </motion.h2>
+              {FOUNDER.lead}
 
-            <p className="mt-6 text-lg text-ink">{FOUNDER.name}</p>
-            <p className="label mt-1 text-muted">{FOUNDER.role}</p>
+            </motion.h2>
+            <div className="mt-4 max-w-xl space-y-2"><p className="label mt-1 text-muted">{FOUNDER.role}</p></div>
+
 
             <div className="mt-8 max-w-xl space-y-4 text-ink-soft">
               {FOUNDER.paragraphs.map((p) => (

@@ -53,7 +53,7 @@ export default function Hero() {
             className="display max-w-5xl text-center text-ink [text-wrap:balance]"
           >
             <p className="label text-ink">Художественная мастерская</p>
-            <span className="label text-signal">Екатерины Сергиевской</span>
+            <span className="label text-signal">Сергиевской Екатерины</span>
           </motion.h1>
         </motion.div>
 
